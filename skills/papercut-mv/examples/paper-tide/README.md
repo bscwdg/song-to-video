@@ -20,4 +20,4 @@ npm run typecheck
 npm run render
 ```
 
-The example still uses a global composition timeline rather than the v0.2 scene-props contract. That is intentional: it documents the delivered film. New projects should start from `../../template/`, which uses `timeline.generated.ts`, measured-beat helpers and a scene registry.
+The example still uses a global composition timeline rather than the current scene-props contract. That is intentional: it documents the delivered film. New projects should start from `../../template/`, which uses `timeline.generated.ts`, measured-beat helpers and a scene registry.

@@ -1,4 +1,4 @@
-# v0.2 validation
+# Validation
 
 ## Template independence
 

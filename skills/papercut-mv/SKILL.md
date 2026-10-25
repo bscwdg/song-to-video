@@ -3,7 +3,7 @@ name: papercut-mv
 description: "用 Remotion + React + SVG 制作层叠剪纸动效音乐视频。适用于把用户提供的歌曲拆成 9 个左右不重复构图、按真实拍点剪辑、用纸偶/纸浪/纸云/孔明灯等程序化元素表演的 MV；也适用于从参考 MV 中逆向风格规则、节拍卡点、纸感音效与质检流程。关键词：剪纸 MV、paper-cut music video、Remotion 动画、歌词卡点、分层纸偶、paper stop-motion、程序化音效。"
 license: MIT
 metadata:
-  version: "0.2.0"
+  version: "0.1.0"
   stack: "Remotion 4 / React 19 / SVG / TypeScript / Python / ffmpeg"
   aspect: "16:9 by default; vertical requires a separate composition"
 ---
