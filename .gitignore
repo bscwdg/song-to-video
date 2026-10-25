@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Build and render outputs
+out/
+**/out/
+dist/
+frames/
+frames_v2/
+preview/
+.vibe02-build/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# User media and rendered video: never commit these
+**/video/
+**/videos/
+**/public/audio/*
+!**/public/audio/README.md
+**/public/sfx/*
+!**/public/sfx/README.md
+*.mp4
+*.mov
+*.m4v
+*.webm
+*.mkv
+*.wav
+*.mp3
+*.m4a
+*.aac
+*.flac
+*.ogg
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+
+# Local settings and logs
+.claude/
+.DS_Store
+*.log

@@ -1,0 +1,15 @@
+{
+  "cues": [
+    {"t": 0.1625, "file": "paper-rise.wav", "volume": 0.055, "durationSeconds": 0.9},
+    {"t": 3.2276, "file": "curtain-split.wav", "volume": 0.05, "durationSeconds": 0.8},
+    {"t": 5.8514, "file": "page-fall.wav", "volume": 0.045, "durationSeconds": 0.7},
+    {"t": 9.2183, "file": "chime.wav", "volume": 0.045, "durationSeconds": 1.1},
+    {"t": 12.5852, "file": "paper-swish.wav", "volume": 0.05, "durationSeconds": 0.8},
+    {"t": 15.1859, "file": "glint.wav", "volume": 0.042, "durationSeconds": 1.2},
+    {"t": 18.2277, "file": "shimmer.wav", "volume": 0.04, "durationSeconds": 1.4},
+    {"t": 21.223, "file": "chime.wav", "volume": 0.042, "durationSeconds": 1.1},
+    {"t": 24.5899, "file": "paper-rise.wav", "volume": 0.05, "durationSeconds": 0.9},
+    {"t": 30.6039, "file": "paper-pop.wav", "volume": 0.06, "durationSeconds": 0.7},
+    {"t": 30.9754, "file": "shimmer.wav", "volume": 0.035, "durationSeconds": 1.4}
+  ]
+}

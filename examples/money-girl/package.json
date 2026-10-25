@@ -1,0 +1,25 @@
+{
+  "name": "money-girl-papercut-mv",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Layered paper-cut test MV for the supplied excerpt of 数钱的女孩.",
+  "scripts": {
+    "start": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts PaperCutMV out/papercut-mv.mp4 --codec=h264 --crf=16 --pixel-format=yuv420p",
+    "still": "remotion still src/index.ts PaperCutMV out/poster.png --frame=45",
+    "typecheck": "tsc --noEmit",
+    "smoke": "remotion still src/index.ts PaperCutMV out/smoke.png --frame=45"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.538",
+    "@remotion/google-fonts": "4.0.538",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.538"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "typescript": "^5.9.3"
+  }
+}

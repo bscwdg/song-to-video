@@ -1,0 +1,16 @@
+{
+  "cues": [
+    {
+      "t": 0.24,
+      "file": "paper-rise.wav",
+      "volume": 0.07,
+      "durationSeconds": 0.5
+    },
+    {
+      "t": 1.8,
+      "file": "paper-swish.wav",
+      "volume": 0.08,
+      "durationSeconds": 0.5
+    }
+  ]
+}

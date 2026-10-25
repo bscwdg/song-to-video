@@ -1,0 +1,7 @@
+node_modules/
+out/
+*.log
+public/audio/*
+!public/audio/README.md
+public/sfx/*.wav
+!public/sfx/README.md
