@@ -35,7 +35,7 @@ Remotion render
 qa_video.py + contact_sheet.py
 ```
 
-详细说明见 [docs/PIPELINE.md](docs/PIPELINE.md)。
+使用方法和调用示例见 [docs/USAGE.md](docs/USAGE.md)，底层流程见 [docs/PIPELINE.md](docs/PIPELINE.md)。
 
 ## 仓库结构
 
@@ -52,13 +52,15 @@ song-to-video/
 │  ├─ papercut-song/        # 《纸潮》完整九镜实现
 │  └─ money-girl/           # 《数钱的女孩》32s 换歌测试
 └─ docs/
+   ├─ USAGE.md
    └─ PIPELINE.md
 ```
 
 ## 快速开始
 
 ```powershell
-cd skills\papercut-mv\template
+Copy-Item skills\papercut-mv\template examples\my-song -Recurse
+cd examples\my-song
 npm install
 python -m pip install -r requirements.txt
 

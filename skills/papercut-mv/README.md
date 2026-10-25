@@ -35,3 +35,23 @@ examples/paper-tide/
 
 真正可变的只有歌曲、歌词、角色造型、九镜的具体故事与色彩。
 
+## 使用方式
+
+复制 `template/` 到一个新项目，放入用户歌曲和歌词，然后让 Agent 按
+[`SKILL.md`](SKILL.md) 的七步工作流执行：
+
+```powershell
+Copy-Item template ..\..\examples\my-song -Recurse
+```
+
+如果要把 skill 安装到 Codex：
+
+```powershell
+$dst = Join-Path $env:USERPROFILE ".codex\skills\papercut-mv"
+New-Item -ItemType Directory -Force $dst | Out-Null
+Copy-Item ".\*" $dst -Recurse -Force
+```
+
+完整调用示例与输入格式见仓库的
+[`docs/USAGE.md`](../../docs/USAGE.md)。
+
