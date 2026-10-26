@@ -307,146 +307,164 @@
     {
       "start": 0.41,
       "end": 2.0,
-      "text": "心爱的女孩她已经很如愿了",
+      "text": "〈歌词 01 · 12 字〉",
       "nearestBeat": 0.5573,
       "beatIndex": 1,
-      "beatDeltaMs": 147.3
+      "beatDeltaMs": 147.3,
+      "redacted": true
     },
     {
       "start": 2.0,
       "end": 3.11,
-      "text": "我让她抱到钱数",
+      "text": "〈歌词 02 · 7 字〉",
       "nearestBeat": 2.113,
       "beatIndex": 5,
-      "beatDeltaMs": 113.0
+      "beatDeltaMs": 113.0,
+      "redacted": true
     },
     {
       "start": 3.11,
       "end": 4.09,
-      "text": "今年我会举办场婚礼",
+      "text": "〈歌词 03 · 9 字〉",
       "nearestBeat": 3.2276,
       "beatIndex": 8,
-      "beatDeltaMs": 117.6
+      "beatDeltaMs": 117.6,
+      "redacted": true
     },
     {
       "start": 4.09,
       "end": 6.03,
-      "text": "也许我们一样在舞台上放声大哭",
+      "text": "〈歌词 04 · 14 字〉",
       "nearestBeat": 3.9938,
       "beatIndex": 10,
-      "beatDeltaMs": -96.2
+      "beatDeltaMs": -96.2,
+      "redacted": true
     },
     {
       "start": 6.03,
       "end": 7.3,
-      "text": "以前的那混蛋心里面",
+      "text": "〈歌词 05 · 9 字〉",
       "nearestBeat": 5.8514,
       "beatIndex": 15,
-      "beatDeltaMs": -178.6
+      "beatDeltaMs": -178.6,
+      "redacted": true
     },
     {
       "start": 7.3,
       "end": 9.19,
-      "text": "如今也多了些很多人在他哪儿住",
+      "text": "〈歌词 06 · 14 字〉",
       "nearestBeat": 7.3607,
       "beatIndex": 19,
-      "beatDeltaMs": 60.7
+      "beatDeltaMs": 60.7,
+      "redacted": true
     },
     {
       "start": 9.19,
       "end": 10.25,
-      "text": "第二杯敬我的家庭",
+      "text": "〈歌词 07 · 8 字〉",
       "nearestBeat": 9.2183,
       "beatIndex": 24,
-      "beatDeltaMs": 28.3
+      "beatDeltaMs": 28.3,
+      "redacted": true
     },
     {
       "start": 10.25,
       "end": 12.51,
-      "text": "用第一杯首先要敬 我的4个父母",
+      "text": "〈歌词 08 · 15 字〉",
       "nearestBeat": 10.3561,
       "beatIndex": 27,
-      "beatDeltaMs": 106.1
+      "beatDeltaMs": 106.1,
+      "redacted": true
     },
     {
       "start": 12.51,
       "end": 14.19,
-      "text": "心爱的女孩她已经很如愿了",
+      "text": "〈歌词 09 · 12 字〉",
       "nearestBeat": 12.5852,
       "beatIndex": 33,
-      "beatDeltaMs": 75.2
+      "beatDeltaMs": 75.2,
+      "redacted": true
     },
     {
       "start": 14.19,
       "end": 15.23,
-      "text": "我让她抱到钱数",
+      "text": "〈歌词 10 · 7 字〉",
       "nearestBeat": 14.0945,
       "beatIndex": 37,
-      "beatDeltaMs": -95.5
+      "beatDeltaMs": -95.5,
+      "redacted": true
     },
     {
       "start": 15.23,
       "end": 16.39,
-      "text": "今年我会举办场婚礼",
+      "text": "〈歌词 11 · 9 字〉",
       "nearestBeat": 15.1859,
       "beatIndex": 40,
-      "beatDeltaMs": -44.1
+      "beatDeltaMs": -44.1,
+      "redacted": true
     },
     {
       "start": 16.39,
       "end": 18.16,
-      "text": "也许我们一样在舞台上放声大哭",
+      "text": "〈歌词 12 · 14 字〉",
       "nearestBeat": 16.3468,
       "beatIndex": 43,
-      "beatDeltaMs": -43.2
+      "beatDeltaMs": -43.2,
+      "redacted": true
     },
     {
       "start": 18.16,
       "end": 19.23,
-      "text": "以前的那混蛋心里面",
+      "text": "〈歌词 13 · 9 字〉",
       "nearestBeat": 18.2277,
       "beatIndex": 48,
-      "beatDeltaMs": 67.7
+      "beatDeltaMs": 67.7,
+      "redacted": true
     },
     {
       "start": 19.23,
       "end": 21.14,
-      "text": "如今也多了些很多人在他哪儿住",
+      "text": "〈歌词 14 · 14 字〉",
       "nearestBeat": 19.3422,
       "beatIndex": 51,
-      "beatDeltaMs": 112.2
+      "beatDeltaMs": 112.2,
+      "redacted": true
     },
     {
       "start": 21.14,
       "end": 22.17,
-      "text": "第二杯敬我的家庭",
+      "text": "〈歌词 15 · 8 字〉",
       "nearestBeat": 21.223,
       "beatIndex": 56,
-      "beatDeltaMs": 83.0
+      "beatDeltaMs": 83.0,
+      "redacted": true
     },
     {
       "start": 22.17,
       "end": 24.49,
-      "text": "用第一杯首先要敬 我的4个父母",
+      "text": "〈歌词 16 · 15 字〉",
       "nearestBeat": 22.3376,
       "beatIndex": 59,
-      "beatDeltaMs": 167.6
+      "beatDeltaMs": 167.6,
+      "redacted": true
     },
     {
       "start": 24.49,
       "end": 30.49,
-      "text": "数钱吧女孩没日没夜",
+      "text": "〈歌词 17 · 9 字〉",
       "nearestBeat": 24.5899,
       "beatIndex": 65,
-      "beatDeltaMs": 99.9
+      "beatDeltaMs": 99.9,
+      "redacted": true
     },
     {
       "start": 30.49,
       "end": 32.09,
-      "text": "和我们以前的自己告别",
+      "text": "〈歌词 18 · 10 字〉",
       "nearestBeat": 30.6039,
       "beatIndex": 81,
-      "beatDeltaMs": 113.9
+      "beatDeltaMs": 113.9,
+      "redacted": true
     }
   ]
 }
