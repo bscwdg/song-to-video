@@ -1,8 +1,9 @@
 {
   "id": "painted-animation",
   "name": "手绘水彩动画",
-  "status": "preview",
+  "status": "beta",
   "source": "opus-video-skills/painted-animation",
+  "template": "styles/painted-animation/template",
   "bestFor": ["情绪型歌词", "角色叙事", "手绘短篇", "歌词 MV"],
   "palette": ["#f5ead5", "#d9765f", "#5c8f9b", "#d9a441", "#20252a"],
   "typography": ["手写体", "少量衬线标题", "避免无衬线大标语"],

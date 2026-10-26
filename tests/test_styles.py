@@ -48,6 +48,14 @@ class StyleRegistryTest(unittest.TestCase):
                 continue
             self.assertTrue((preview_root / f"{style['id']}.tsx").is_file(), style["id"])
 
+    def test_beta_styles_have_runnable_template(self):
+        for style in self.styles:
+            if style["status"] != "beta":
+                continue
+            template = REPO / style["template"]
+            self.assertTrue((template / "package.json").is_file(), style["id"])
+            self.assertTrue((template / "src" / "Root.tsx").is_file(), style["id"])
+
 
 if __name__ == "__main__":
     unittest.main()

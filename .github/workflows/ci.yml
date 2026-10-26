@@ -55,3 +55,17 @@ jobs:
       - name: Typecheck
         working-directory: examples/style-gallery
         run: npx tsc --noEmit
+
+  painted-animation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install
+        working-directory: styles/painted-animation/template
+        run: npm ci --include=dev
+      - name: Typecheck
+        working-directory: styles/painted-animation/template
+        run: npx tsc --noEmit

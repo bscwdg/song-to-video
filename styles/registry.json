@@ -12,9 +12,10 @@
     {
       "id": "painted-animation",
       "name": "手绘水彩动画",
-      "status": "preview",
+      "status": "beta",
       "path": "styles/painted-animation",
       "preview": "examples/style-gallery",
+      "template": "styles/painted-animation/template",
       "description": "水彩晕染、沸腾墨线、角色与情绪叙事。"
     },
     {

@@ -113,7 +113,7 @@ python ..\..\skills\papercut-mv\scripts\storyboard_to_timeline.py `
 - 把 Seedream/Seedance 当作必需依赖
 - 用更多参数、更多镜头、更多 QA 指标掩盖语义缺失
 
-当前只有 `papercut-mv` 是 stable；`painted-animation`、`kinetic-reel`、`ink-wash`、`flat-explainer`、`pixel-8bit` 是 preview 风格包，已能选择、预览和写进 storyboard，但还没有完整生产级场景库。
+`papercut-mv` 是 stable；`painted-animation` 已到 beta（有可运行模板和风格演示）；`kinetic-reel`、`ink-wash`、`flat-explainer`、`pixel-8bit` 是 preview 风格包，已能选择、预览和写进 storyboard，但还没有完整生产级场景库。
 
 ## 媒体与版权
 
