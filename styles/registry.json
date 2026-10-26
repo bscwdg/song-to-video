@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "styles": [
+    {
+      "id": "papercut-mv",
+      "name": "层叠剪纸",
+      "status": "stable",
+      "path": "skills/papercut-mv",
+      "preview": "examples/money-girl",
+      "description": "分层纸片、手撕纸边、纸偶与拍点驱动转场。"
+    },
+    {
+      "id": "painted-animation",
+      "name": "手绘水彩动画",
+      "status": "preview",
+      "path": "styles/painted-animation",
+      "preview": "examples/style-gallery",
+      "description": "水彩晕染、沸腾墨线、角色与情绪叙事。"
+    },
+    {
+      "id": "kinetic-reel",
+      "name": "动态字体 Reel",
+      "status": "preview",
+      "path": "styles/kinetic-reel",
+      "preview": "examples/style-gallery",
+      "description": "大字排版、HUD 微文字、黑奶油荧光绿与形状连续性转场。"
+    },
+    {
+      "id": "ink-wash",
+      "name": "水墨国风",
+      "status": "preview",
+      "path": "styles/ink-wash",
+      "preview": "examples/style-gallery",
+      "description": "宣纸留白、墨色山峦、竖排文字与克制运镜。"
+    },
+    {
+      "id": "flat-explainer",
+      "name": "扁平插画科普",
+      "status": "preview",
+      "path": "styles/flat-explainer",
+      "preview": "examples/style-gallery",
+      "description": "明亮色块、轨道/箭头/标签，靠图形关系解释概念。"
+    },
+    {
+      "id": "pixel-8bit",
+      "name": "8-bit 像素",
+      "status": "preview",
+      "path": "styles/pixel-8bit",
+      "preview": "examples/style-gallery",
+      "description": "低分辨率像素、滚动关卡、像素精灵与扫描线。"
+    }
+  ]
+}

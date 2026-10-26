@@ -1,0 +1,12 @@
+{
+  "id": "flat-explainer",
+  "name": "扁平插画科普",
+  "status": "preview",
+  "source": "code-video-showcase/style-recipes/01",
+  "bestFor": ["概念型歌词", "关系解释", "轻科普", "明亮情绪"],
+  "palette": ["#081a3f", "#ffd24a", "#ff8a3d", "#2f6fd0", "#eaf4ff"],
+  "typography": ["圆润无衬线", "大标题", "胶囊标签"],
+  "motion": ["轨道运动", "标签弹出", "色块生长", "箭头连线"],
+  "archetypes": ["orbit-explainer", "diagram-pop", "label-stack"],
+  "avoid": ["写实纹理", "复杂 3D", "过度噪点"]
+}

@@ -22,6 +22,7 @@
 - **稳定 skill**：`skills/papercut-mv`
 - **核心协议**：[docs/STORYBOARD_SPEC.md](docs/STORYBOARD_SPEC.md)
 - **镜头数规则**：[docs/SHOT_PLANNING.md](docs/SHOT_PLANNING.md)
+- **风格包**：[styles/README.md](styles/README.md)
 - **产品边界**：[docs/PRODUCT.md](docs/PRODUCT.md)
 - **使用说明**：[docs/USAGE.md](docs/USAGE.md)
 - **4 镜质量样例**：[examples/storyboard-first](examples/storyboard-first)（16 秒测试，不是固定镜头数）
@@ -41,7 +42,9 @@
 song-to-video/
 ├─ skills/
 │  └─ papercut-mv/          # 稳定剪纸 skill
+├─ styles/                   # 5 个 preview 风格包 + registry
 ├─ examples/
+│  ├─ style-gallery/         # 五种风格 20 秒预览
 │  ├─ storyboard-first/     # 4 镜语义分镜样例（非固定规则）
 │  ├─ money-girl/           # 手工剪纸案例
 │  └─ papercut-song/        # 早期九镜案例
@@ -100,6 +103,7 @@ python ..\..\skills\papercut-mv\scripts\storyboard_to_timeline.py `
 5. **模板与案例分离。** 模板不包含某一首歌的歌词、切点和导演内容。
 6. **先看画面，再谈完成。** 自动 QA 不能判断歌词和画面是否相关。
 7. **实验不污染主路径。** v2 引擎、Seedream、自动导演先留在 `experiments/`。
+8. **风格不是换颜色。** 每个 style pack 约束构图、动作、字体、色板、声音与禁止项。
 
 ## 当前不做
 
@@ -108,6 +112,8 @@ python ..\..\skills\papercut-mv\scripts\storyboard_to_timeline.py `
 - 先扩 40 个意象库，再验证画面是否成立
 - 把 Seedream/Seedance 当作必需依赖
 - 用更多参数、更多镜头、更多 QA 指标掩盖语义缺失
+
+当前只有 `papercut-mv` 是 stable；`painted-animation`、`kinetic-reel`、`ink-wash`、`flat-explainer`、`pixel-8bit` 是 preview 风格包，已能选择、预览和写进 storyboard，但还没有完整生产级场景库。
 
 ## 媒体与版权
 

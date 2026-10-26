@@ -1,0 +1,12 @@
+{
+  "id": "painted-animation",
+  "name": "手绘水彩动画",
+  "status": "preview",
+  "source": "opus-video-skills/painted-animation",
+  "bestFor": ["情绪型歌词", "角色叙事", "手绘短篇", "歌词 MV"],
+  "palette": ["#f5ead5", "#d9765f", "#5c8f9b", "#d9a441", "#20252a"],
+  "typography": ["手写体", "少量衬线标题", "避免无衬线大标语"],
+  "motion": ["水彩晕开", "沸腾墨线", "笔触擦入", "角色逐步上色"],
+  "archetypes": ["watercolor-world", "character-beat", "ink-reveal"],
+  "avoid": ["霓虹", "3D 渲染", "玻璃拟态", "复杂 UI"]
+}

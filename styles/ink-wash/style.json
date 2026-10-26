@@ -1,0 +1,12 @@
+{
+  "id": "ink-wash",
+  "name": "水墨国风",
+  "status": "preview",
+  "source": "code-video-showcase/style-recipes/06",
+  "bestFor": ["中文意象", "山水", "历史与文化", "克制抒情"],
+  "palette": ["#f2eadb", "#1c2524", "#6b7f77", "#b44936", "#d4c7ae"],
+  "typography": ["宋体", "竖排标题", "印章式小字"],
+  "motion": ["墨晕扩散", "雾层移动", "山体推远", "留白变化"],
+  "archetypes": ["ink-mountains", "mist-reveal", "seal-close"],
+  "avoid": ["高饱和霓虹", "3D 塑料", "西式 HUD"]
+}

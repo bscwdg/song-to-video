@@ -4,6 +4,10 @@
 
 它把“歌词”翻译成“为什么这样拍”，再交给代码生成时间轴和场景。
 
+顶层 `style` 选择视觉风格包，可用 id 见
+[`styles/registry.json`](../styles/registry.json)。当前稳定风格是
+`papercut-mv`，另外五种是 preview 级风格包。
+
 **镜头数不是固定值。** 先分组歌词，再按
 [`SHOT_PLANNING.md`](SHOT_PLANNING.md) 决定合并或拆分。下面的 4 镜示例只用于
 16 秒质量校验，不代表所有歌曲都做 4 镜。
@@ -24,6 +28,7 @@
 ```json
 {
   "version": 1,
+  "style": "papercut-mv",
   "title": "4-shot quality gate",
   "segment": {"start": 0, "end": 16},
   "fps": 30,

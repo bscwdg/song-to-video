@@ -46,6 +46,7 @@ def validate_storyboard(
     if payload.get("version") != 1:
         errors.append("version must be 1")
 
+    _text(payload.get("style"), "style", errors)
     _text(payload.get("title"), "title", errors)
     fps = _number(payload.get("fps"), "fps", errors)
     duration = _number(payload.get("duration"), "duration", errors)

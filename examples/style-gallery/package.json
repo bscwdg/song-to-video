@@ -1,0 +1,23 @@
+{
+  "name": "song-to-video-style-gallery",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Preview five style packs for song-to-video.",
+  "scripts": {
+    "start": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts StyleGallery out/style-gallery.mp4 --codec=h264 --crf=18 --pixel-format=yuv420p",
+    "typecheck": "tsc --noEmit",
+    "still": "remotion still src/index.ts StyleGallery out/poster.png --frame=45"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.538",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.538"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "typescript": "^5.9.3"
+  }
+}

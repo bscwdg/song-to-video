@@ -1,0 +1,12 @@
+{
+  "id": "kinetic-reel",
+  "name": "动态字体 Reel",
+  "status": "preview",
+  "source": "opus-video-skills/kinetic-reel",
+  "bestFor": ["Hook", "副歌", "节奏强的歌", "作品集式字幕"],
+  "palette": ["#0b0b0c", "#f1ead9", "#c7ff3d", "#ff6b4a"],
+  "typography": ["压缩展示体", "宽体粗黑", "等宽微文字"],
+  "motion": ["大字砸入", "形状连续性转场", "HUD 计数", "镜头穿过字母"],
+  "archetypes": ["type-slam", "hud-grid", "shape-continuity"],
+  "avoid": ["柔和插画", "纸纹堆叠", "过多装饰"]
+}

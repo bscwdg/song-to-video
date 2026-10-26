@@ -32,6 +32,7 @@ timing.json / timeline codegen
 2. 歌词驱动分镜协议：`docs/STORYBOARD_SPEC.md`
 3. 两个手工案例：`examples/money-girl`、`examples/papercut-song`
 4. 一个 storyboard-first 样例：`examples/storyboard-first`（当前 4 镜 / 16 秒，仅用于质量校验）
+5. 五个 preview 风格包：`styles/`
 
 镜头数不设固定值，规则见 [`SHOT_PLANNING.md`](SHOT_PLANNING.md)。
 
@@ -39,7 +40,7 @@ timing.json / timeline codegen
 
 - 任意歌曲一键出片
 - 不需要人工确认的自动导演
-- 任意视觉风格
+- 一次接入就等同于完整生产级风格
 - Seedream / Seedance 作为必需依赖
 - 以镜头数量、参数数量或自动化程度代替画面质量
 

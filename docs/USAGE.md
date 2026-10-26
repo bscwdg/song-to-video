@@ -94,6 +94,7 @@ Copy-Item "$src\*" $dst -Recurse -Force
 
 它把每句歌词绑定到：
 
+- `style`：使用哪套视觉风格，id 见 `styles/registry.json`
 - `intent`：这句在讲什么
 - `metaphor`：观众具体看到什么
 - `scene`：构图、主体、机位、色板、动作、转场

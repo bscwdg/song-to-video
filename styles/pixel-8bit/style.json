@@ -1,0 +1,12 @@
+{
+  "id": "pixel-8bit",
+  "name": "8-bit 像素",
+  "status": "preview",
+  "source": "code-video-showcase/style-recipes/08",
+  "bestFor": ["游戏感", "复古", "轻松段落", "童年回忆"],
+  "palette": ["#0a0f1c", "#1f3a5f", "#4aa3df", "#f2c14e", "#f25f5c"],
+  "typography": ["等宽像素字", "关卡 HUD", "小字号状态栏"],
+  "motion": ["横版卷轴", "精灵跳跃", "金币旋转", "像素闪烁"],
+  "archetypes": ["pixel-stage", "sprite-jump", "score-hud"],
+  "avoid": ["平滑渐变", "水彩纸纹", "复杂 3D"]
+}

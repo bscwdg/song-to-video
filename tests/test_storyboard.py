@@ -42,6 +42,12 @@ class StoryboardContractTest(unittest.TestCase):
         errors, _ = validate_storyboard(payload)
         self.assertTrue(any("metaphor" in error for error in errors))
 
+    def test_missing_style_is_rejected(self):
+        payload = copy.deepcopy(self.payload)
+        del payload["style"]
+        errors, _ = validate_storyboard(payload)
+        self.assertTrue(any("style" in error for error in errors))
+
     def test_duplicate_archetype_is_only_a_warning(self):
         payload = copy.deepcopy(self.payload)
         payload["shots"][1]["scene"]["archetype"] = payload["shots"][0]["scene"]["archetype"]
