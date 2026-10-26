@@ -34,7 +34,7 @@ def _text(value: Any, label: str, errors: list[str]) -> str | None:
 def validate_storyboard(
     payload: Any,
     *,
-    tolerance: float = 0.15,
+    tolerance: float = 0.25,
 ) -> tuple[list[str], list[str]]:
     """Return (errors, warnings) for a storyboard payload."""
     errors: list[str] = []
@@ -214,7 +214,7 @@ def validate_storyboard(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("storyboard", type=Path)
-    parser.add_argument("--tolerance", type=float, default=0.15)
+    parser.add_argument("--tolerance", type=float, default=0.25)
     parser.add_argument(
         "--strict",
         action="store_true",

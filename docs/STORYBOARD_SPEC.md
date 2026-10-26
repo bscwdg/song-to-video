@@ -112,6 +112,9 @@
 6. duplicate archetype 只能作为有意回环，不能作为自动轮转的副作用。
 7. 先确认 JSON，再写场景代码。
 
+歌词起唱/收尾允许最多 250ms 越过镜头边界，因为切点需要吸附到实测拍点；
+超过 250ms 会被 `validate_storyboard.py` 拒绝。
+
 ## 验证
 
 ```powershell
