@@ -1,0 +1,41 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install analysis deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r skills/papercut-mv/requirements.txt
+          pip install pillow scipy
+      - name: Script mirrors must not drift
+        run: python skills/papercut-mv/scripts/sync_scripts.py --check
+      - name: Compile every pipeline script
+        run: |
+          python -m compileall -q skills/papercut-mv/scripts tests
+      - name: Pipeline tests
+        run: python -m unittest discover -s tests -v
+
+  remotion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install
+        working-directory: examples/v2-lab
+        run: npm ci --include=dev
+      - name: Typecheck
+        working-directory: examples/v2-lab
+        run: npx tsc --noEmit
