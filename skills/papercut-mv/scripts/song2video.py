@@ -23,7 +23,19 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
 
 
+def resolve_executable(name: str) -> str:
+    """Resolve a command for subprocess.
+
+    On Windows `npx` is a `.cmd` shim; passing the bare name to subprocess
+    raises FileNotFoundError (WinError 2) because CreateProcess does not search
+    PATHEXT. Resolving through PATH first keeps this cross-platform.
+    """
+    found = shutil.which(name)
+    return found or name
+
+
 def run(step: list[str], cwd: Path) -> None:
+    step = [resolve_executable(step[0]), *step[1:]]
     print("$", " ".join(step))
     subprocess.run(step, cwd=str(cwd), check=True)
 
@@ -37,6 +49,15 @@ def main() -> None:
     parser.add_argument("--render", action="store_true")
     parser.add_argument("--crf", default="16")
     parser.add_argument("--scale", default="1")
+    parser.add_argument(
+        "--qa",
+        choices=("auto", "strict", "off"),
+        default="auto",
+        help="run delivery checks after rendering (auto: warn, strict: fail the run)",
+    )
+    parser.add_argument(
+        "--portrait", action="store_true", help="render the 9:16 composition instead"
+    )
     parser.add_argument(
         "--browser-executable",
         default=r"C:\Program Files\Google\Chrome\Application\chrome.exe",
@@ -86,6 +107,7 @@ def main() -> None:
     run(direct, REPO)
 
     summary = json.loads(shots_json.read_text(encoding="utf-8"))
+    composition = "V2SongPortrait" if args.portrait else "V2Song"
     print(
         json.dumps(
             {
@@ -96,7 +118,7 @@ def main() -> None:
                 "next": (
                     "render"
                     if args.render
-                    else f"npx remotion render src/index.ts V2Song out/song.mp4 "
+                    else f"npx remotion render src/index.ts {composition} out/song.mp4 "
                     f"--codec=h264 --crf={args.crf} --pixel-format=yuv420p"
                 ),
             },
@@ -106,13 +128,15 @@ def main() -> None:
     )
 
     if args.render:
+        composition = "V2SongPortrait" if args.portrait else "V2Song"
+        output = "out/song-portrait.mp4" if args.portrait else "out/song.mp4"
         command = [
             "npx",
             "remotion",
             "render",
             "src/index.ts",
-            "V2Song",
-            "out/song.mp4",
+            composition,
+            output,
             "--codec=h264",
             f"--crf={args.crf}",
             "--pixel-format=yuv420p",
@@ -122,6 +146,22 @@ def main() -> None:
         if Path(args.browser_executable).exists():
             command.append(f"--browser-executable={args.browser_executable}")
         run(command, project)
+
+        # Rendering without checking is how a film with three static seconds
+        # ships as PASS. QA runs by default; strict mode makes it authoritative.
+        if args.qa != "off":
+            qa_command = [
+                sys.executable,
+                str(HERE / "qa_video.py"),
+                str(project / output),
+                "--timing",
+                str(song_json),
+            ]
+            if args.portrait:
+                qa_command += ["--width", "1080", "--height", "1920"]
+            if args.qa == "strict":
+                qa_command.append("--strict")
+            run(qa_command, REPO)
 
 
 if __name__ == "__main__":
