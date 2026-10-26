@@ -203,6 +203,13 @@ python scripts/contact_sheet.py out/papercut-mv.mp4 --timing timing.json \
 - `timing.json` 生成的 `src/generated/timeline.generated.ts`
 - `STORYBOARD.md`
 
+## v2 参数化引擎（实验）
+
+`examples/v2-lab` 走了另一条路径：不逐歌手写场景，而是
+`song_facts.py -> song.json -> direct.py -> shots.json -> 5 个参数化构图`。
+切点量化到小节线，镜头长度由段落能量决定，构图库负责纸感与视差。
+真实歌曲仍需人工审分镜与美术；详见 `examples/v2-lab/README.md`。
+
 ## Remotion + SVG 踩坑
 
 - **绝对定位的 `<AbsoluteFill>` 背景会盖住后面的普通流式 `<svg>`。** 主 SVG 自己也必须是 `position:absolute; inset:0`，否则浏览器只显示渐变和字幕。
@@ -239,6 +246,9 @@ reference analysis -> style DNA -> engine template -> one finished example -> QA
 - `references/composition-matrix.md`：九镜不重复构图检查表
 - `references/qa.md`：交付前验收清单
 - `scripts/analyze_track.py`：BPM、实测拍点、切点吸附、`musical_body_end`、codegen
+- `scripts/song_facts.py`：v2 声音事实（downbeat / 小节 / 段落 / 逐拍能量）
+- `scripts/direct.py`：v2 小节量化分镜 + `STORYBOARD.md` + Remotion TS
+- `scripts/song2video.py`：v2 一条命令入口（分析 → 分镜 → codegen → 可选渲染）
 - `scripts/generate_sfx.py`：纸感音效合成
 - `scripts/qa_video.py`：参数化编码/时长/流检查
 - `scripts/contact_sheet.py`：按 `timing.json` 每个 scene 取中间帧

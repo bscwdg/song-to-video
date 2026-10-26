@@ -1,0 +1,10 @@
+node_modules/
+out/
+*.log
+song.json
+shots.json
+STORYBOARD.auto.md
+public/audio/*
+!public/audio/README.md
+public/sfx/*.wav
+!public/sfx/README.md

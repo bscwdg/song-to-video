@@ -20,6 +20,7 @@
 - 场景美术仍需按 visual style / storyboard 实现
 - 目前只内置 16:9 剪纸模板；竖屏及其他风格需要单独设计
 - 示例歌曲仅用于本地验证，不随仓库分发
+- **v2 参数化引擎实验**在 `examples/v2-lab`：5 个参数化构图、三层视差、关节纸偶、小节量化自动分镜；一条命令跑通 歌 → song.json → shots.json → 渲染
 
 ## 工作流
 
@@ -49,6 +50,7 @@ song-to-video/
 │     ├─ template/
 │     └─ examples/paper-tide/
 ├─ examples/
+│  ├─ v2-lab/             # v2 参数化引擎：构图库 + 自动分镜
 │  ├─ papercut-song/        # 《纸潮》完整九镜实现
 │  └─ money-girl/           # 《数钱的女孩》32s 换歌测试
 └─ docs/
