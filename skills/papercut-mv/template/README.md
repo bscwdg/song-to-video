@@ -32,6 +32,10 @@ This is a reusable 16:9 Remotion starter, not a finished film. It contains no so
    python scripts/validate_storyboard.py storyboard.json
    ```
 
+   The example has four shots because it is a 16-second test. Shot count must
+   follow the song's duration, lyric density and narrative units; see
+   `references` in the parent skill.
+
 5. Generate measured timing and then the Remotion timeline:
 
    ```powershell

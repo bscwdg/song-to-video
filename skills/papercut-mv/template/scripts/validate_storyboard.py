@@ -74,6 +74,7 @@ def validate_storyboard(
     seen_ids: set[str] = set()
     archetypes: list[str] = []
     palettes: list[str] = []
+    shot_durations: list[float] = []
     expected_start = 0.0
     lyric_count = 0
 
@@ -96,6 +97,8 @@ def validate_storyboard(
                 errors.append(f"{label}.start must be >= 0")
             if end <= start:
                 errors.append(f"{label}.end must be > start")
+            else:
+                shot_durations.append(end - start)
             if abs(start - expected_start) > 1e-3:
                 errors.append(
                     f"{label}.start={start:.3f} does not continue from "
@@ -180,6 +183,30 @@ def validate_storyboard(
         warnings.append("all shots use the same palette")
     if lyric_count == 0:
         warnings.append("storyboard has no lyric lines; confirm the segment is instrumental")
+
+    if shot_durations:
+        average = sum(shot_durations) / len(shot_durations)
+        if lyric_count >= 12 and average > 7.0:
+            warnings.append(
+                f"dense lyric segment averages {average:.1f}s per shot; "
+                "confirm this is intentional and not too static"
+            )
+        if average < 1.5:
+            warnings.append(
+                f"average shot length is {average:.1f}s; confirm this is a montage, "
+                "not unintentional fragmentation"
+            )
+        for index, shot_duration in enumerate(shot_durations):
+            if shot_duration < 0.8:
+                warnings.append(
+                    f"shot {index + 1} is {shot_duration:.2f}s; "
+                    "short shots need a punctuation/transition reason"
+                )
+            if shot_duration > 8.0:
+                warnings.append(
+                    f"shot {index + 1} is {shot_duration:.2f}s; "
+                    "confirm it has an internal phase change"
+                )
 
     return errors, warnings
 

@@ -86,6 +86,28 @@ class StoryboardContractTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             build_timeline(timing, self.payload)
 
+    def test_dense_lyrics_with_long_average_shot_warns(self):
+        payload = copy.deepcopy(self.payload)
+        payload["duration"] = 32
+        payload["shots"] = [payload["shots"][0], payload["shots"][1]]
+        payload["shots"][0]["start"] = 0
+        payload["shots"][0]["end"] = 16
+        payload["shots"][0]["cut"]["snapped"] = 16
+        payload["shots"][1]["start"] = 16
+        payload["shots"][1]["end"] = 32
+        payload["shots"][1]["cut"]["snapped"] = 32
+        payload["shots"][0]["lyrics"] = [
+            {"start": 1 + i * 2.4, "end": 2 + i * 2.4, "text": f"line {i}"}
+            for i in range(6)
+        ]
+        payload["shots"][1]["lyrics"] = [
+            {"start": 17 + i * 2.4, "end": 18 + i * 2.4, "text": f"line {i + 6}"}
+            for i in range(6)
+        ]
+        errors, warnings = validate_storyboard(payload)
+        self.assertEqual(errors, [])
+        self.assertTrue(any("too static" in warning for warning in warnings))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -21,9 +21,10 @@
 
 - **稳定 skill**：`skills/papercut-mv`
 - **核心协议**：[docs/STORYBOARD_SPEC.md](docs/STORYBOARD_SPEC.md)
+- **镜头数规则**：[docs/SHOT_PLANNING.md](docs/SHOT_PLANNING.md)
 - **产品边界**：[docs/PRODUCT.md](docs/PRODUCT.md)
 - **使用说明**：[docs/USAGE.md](docs/USAGE.md)
-- **4 镜质量标杆**：[examples/storyboard-first](examples/storyboard-first)
+- **4 镜质量样例**：[examples/storyboard-first](examples/storyboard-first)（16 秒测试，不是固定镜头数）
 
 `papercut-mv` 的职责是：
 
@@ -41,7 +42,7 @@ song-to-video/
 ├─ skills/
 │  └─ papercut-mv/          # 稳定剪纸 skill
 ├─ examples/
-│  ├─ storyboard-first/     # 4 镜语义分镜合同
+│  ├─ storyboard-first/     # 4 镜语义分镜样例（非固定规则）
 │  ├─ money-girl/           # 手工剪纸案例
 │  └─ papercut-song/        # 早期九镜案例
 ├─ experiments/
@@ -70,7 +71,7 @@ python -m pip install -r requirements.txt
 
 1. 放入歌曲：`public/audio/song.mp3`
 2. 放入歌词：`lyrics.lrc`
-3. 先写 `storyboard.json`，不要直接写九个场景
+3. 先按歌词语义单元决定镜头数，再写 `storyboard.json`
 4. 验证分镜：
 
 ```powershell
@@ -95,9 +96,10 @@ python ..\..\skills\papercut-mv\scripts\storyboard_to_timeline.py `
 1. **先语义，后画面。** 没有 `intent` 和 `metaphor`，不写场景代码。
 2. **实测拍点是唯一时间真相。** 不在场景里另算一套 BPM 网格。
 3. **一镜一构图，一镜一动作。** 不用镜号取模伪装叙事。
-4. **模板与案例分离。** 模板不包含某一首歌的歌词、切点和导演内容。
-5. **先看画面，再谈完成。** 自动 QA 不能判断歌词和画面是否相关。
-6. **实验不污染主路径。** v2 引擎、Seedream、自动导演先留在 `experiments/`。
+4. **镜头数随内容变化。** 时长、歌词密度、段落和能量共同决定，不先定 4 或 9。
+5. **模板与案例分离。** 模板不包含某一首歌的歌词、切点和导演内容。
+6. **先看画面，再谈完成。** 自动 QA 不能判断歌词和画面是否相关。
+7. **实验不污染主路径。** v2 引擎、Seedream、自动导演先留在 `experiments/`。
 
 ## 当前不做
 

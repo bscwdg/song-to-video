@@ -63,12 +63,12 @@ Copy-Item "$src\*" $dst -Recurse -Force
 
 歌曲：D:\music\song.mp3
 歌词：D:\music\song.lrc
-目标：先做 4 个不重复构图，切点吸附到真实拍点。
+目标：镜头数按歌曲时长和歌词结构决定，不要固定成 4 或 9。
 
 先完成：
 1. 音频分析
 2. 拍点和场景切分
-3. 4 镜 storyboard.json：每镜写 intent、metaphor、scene
+3. storyboard.json：每镜写 intent、metaphor、scene，并说明为什么在这里切
 
 先不要渲染整片，等我确认分镜后再实现代码。
 ```
@@ -77,10 +77,16 @@ Copy-Item "$src\*" $dst -Recurse -Force
 
 ```text
 按确认后的 storyboard.json 实现场景。
-先渲染 4 张中点静帧给我看，确认后再渲染整片。
+先渲染每个镜头的 midpoint 静帧给我看，确认后再渲染整片。
 ```
 
 这种方式比直接说“帮我做个视频”更稳定，因为 Agent 不会在分镜未确认时提前铺场景代码。
+
+## 先规划镜头数
+
+镜头数是结果，不是配额。先按歌词的 `intent` 分组，再看时长和能量决定是否合并或拆分。
+
+规则见 [SHOT_PLANNING.md](SHOT_PLANNING.md)。
 
 ## 先写 storyboard.json
 
@@ -182,7 +188,7 @@ Agent 可以根据歌词提出镜头方案，但必须先写成 `storyboard.json
 ## 当前限制
 
 - 只内置 16:9 模板
-- 当前 MVP 先做 4 镜、15–25 秒的片段
+- 镜头数由歌曲时长、歌词密度和语义单元决定，不预设固定值
 - 场景美术需要逐镜实现
 - 分镜和画面质量需要人工审查
 - 不是一键生成任意题材视频的产品

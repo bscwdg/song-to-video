@@ -14,6 +14,7 @@ SKILL.md
 references/style-dna.md
 references/composition-matrix.md
 references/audio-sync.md
+references/shot-planning.md
 references/qa.md
 references/storyboard-schema.json
 scripts/analyze_track.py

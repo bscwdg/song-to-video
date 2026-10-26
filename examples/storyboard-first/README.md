@@ -24,3 +24,6 @@ python skills\papercut-mv\scripts\validate_storyboard.py `
 
 下一步不是扩镜头库，而是把这 4 个镜头做成可审片的质量标杆。
 在它通过人工审看之前，不继续扩 `experiments/v2-engine`。
+
+**注意：4 镜只是为了在 16 秒内做一次质量校验，不是所有歌曲的固定镜头数。**
+实际项目应按 [`docs/SHOT_PLANNING.md`](../../docs/SHOT_PLANNING.md) 决定合并或拆分。

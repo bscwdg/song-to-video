@@ -31,7 +31,9 @@ timing.json / timeline codegen
 1. 稳定 skill：`skills/papercut-mv`
 2. 歌词驱动分镜协议：`docs/STORYBOARD_SPEC.md`
 3. 两个手工案例：`examples/money-girl`、`examples/papercut-song`
-4. 一个 4 镜质量标杆：`examples/storyboard-first`
+4. 一个 storyboard-first 样例：`examples/storyboard-first`（当前 4 镜 / 16 秒，仅用于质量校验）
+
+镜头数不设固定值，规则见 [`SHOT_PLANNING.md`](SHOT_PLANNING.md)。
 
 ## 明确不承诺
 
@@ -43,7 +45,7 @@ timing.json / timeline codegen
 
 ## MVP 验收
 
-先完成一条 15–25 秒、4 个镜头的片段。
+先完成一条 15–30 秒的片段。镜头数由歌词语义单元、时长和段落决定，不预设 4 或 9。
 
 每个镜头必须满足：
 

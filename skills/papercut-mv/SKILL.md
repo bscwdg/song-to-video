@@ -1,6 +1,6 @@
 ---
 name: papercut-mv
-description: "用 Remotion + React + SVG 制作层叠剪纸动效音乐视频。适用于把用户提供的歌曲拆成 4–9 个不重复构图、按真实拍点剪辑、用纸偶/纸浪/纸云/孔明灯等程序化元素表演的 MV；也适用于从参考 MV 中逆向风格规则、节拍卡点、纸感音效与质检流程。关键词：剪纸 MV、paper-cut music video、Remotion 动画、歌词卡点、分层纸偶、paper stop-motion、程序化音效。"
+description: "用 Remotion + React + SVG 制作层叠剪纸动效音乐视频。适用于按歌曲时长、歌词密度和段落把用户提供的歌曲拆成若干不重复构图，按真实拍点剪辑，用纸偶/纸浪/纸云/孔明灯等程序化元素表演；也适用于从参考 MV 中逆向风格规则、节拍卡点、纸感音效与质检流程。关键词：剪纸 MV、paper-cut music video、Remotion 动画、歌词卡点、分层纸偶、paper stop-motion、程序化音效。"
 license: MIT
 metadata:
   version: "0.1.0"
@@ -24,7 +24,7 @@ metadata:
 - 用户给一首歌，要求做剪纸/纸偶/拼贴/纸片 stop-motion 风格的 MV。
 - 用户给了逐句/逐镜分镜，要求用 Remotion、React、SVG 或代码实现。
 - 用户想从 1–3 支参考 MV 反推一种可复用的视频 skill。
-- 用户要“少量镜头、每镜不同构图、切点卡在唱句最近的拍上”。MVP 先做 4 镜，完整片可扩到 9 镜。
+- 用户要“镜头数随歌曲变化、每镜不同构图、切点卡在唱句最近的拍上”。不要预设固定镜头数。
 
 不适用：写实合成、真人拍摄、需要视频/图像生成模型的镜头、复杂长叙事。
 
@@ -291,7 +291,8 @@ reference analysis -> style DNA -> engine template -> one finished example -> QA
 
 - `references/style-dna.md`：纸感、色彩、镜头、转场、角色规则
 - `references/audio-sync.md`：节拍/歌词对齐、SFX 混音
-- `references/composition-matrix.md`：九镜不重复构图检查表
+- `references/composition-matrix.md`：构图去重检查表
+- `references/shot-planning.md`：按歌曲内容决定镜头数
 - `references/qa.md`：交付前验收清单
 - `references/storyboard-schema.json`：歌词驱动分镜的 JSON Schema
 - `scripts/validate_storyboard.py`：校验切点覆盖、歌词归属和语义字段
