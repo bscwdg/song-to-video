@@ -14,6 +14,8 @@ import numpy as np
 
 
 SR = 44_100
+# Default output stays inside the skill package; --out-dir lets a project (e.g.
+# examples/v2-lab) receive the cues so the film can actually play them.
 OUT = Path(__file__).resolve().parents[1] / "public" / "sfx"
 OUT.mkdir(parents=True, exist_ok=True)
 RNG = np.random.default_rng(2600)
@@ -166,6 +168,21 @@ def page_fall() -> None:
 
 
 def main() -> None:
+    global OUT
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--out-dir",
+        type=Path,
+        default=None,
+        help="write cues here instead of the skill's public/sfx",
+    )
+    args = parser.parse_args()
+    if args.out_dir is not None:
+        OUT = args.out_dir.resolve()
+        OUT.mkdir(parents=True, exist_ok=True)
+
     paper_rise()
     paper_swish()
     paper_pop()

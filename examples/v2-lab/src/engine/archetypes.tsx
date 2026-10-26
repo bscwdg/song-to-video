@@ -1,6 +1,6 @@
 import React from "react";
-import type {CameraState} from "./camera";
-import {beatPulse} from "./camera";
+import type {CameraState, BeatHit, BeatMark} from "./camera";
+import {beatPulse, barPulse} from "./camera";
 import type {Palette} from "./palette";
 import type {Stage} from "./stage";
 import {hash, signed, tornPolygon, tornRidge, tornRing, type Point} from "./geom";
@@ -16,12 +16,55 @@ export type ShotProps = {
   cam: CameraState;
   palette: Palette;
   stage: Stage;
-  beats: number[];
+  /** measured beats with accent strength — use beatPulse(time, marks, k) */
+  marks: BeatMark[];
+  /** beats per bar, for anything that counts bars */
+  meter: number;
   intensity: number;
   seed: number;
+  /** what this shot is about; changes per song */
+  subject: string;
+  /** the visual metaphor chosen from the section label */
+  metaphor: string;
+  /** normalised composition slots: focus 0..1, horizon 0..1, density 0..1 */
+  composition: {focus: number; horizon: number; density: number};
 };
 
 const fog = (p: Palette, amount: number) => ({hazeColor: p.haze, hazeAmount: amount});
+
+/* ------------------------------------------------------------------ */
+/* Measured rhythm helpers                                             */
+/* ------------------------------------------------------------------ */
+
+/** Per-beat envelope: strong beats lift, weak beats only breathe. */
+const hit = (time: number, marks: BeatMark[], sharpness = 6): BeatHit =>
+  beatPulse(time, marks, sharpness, {floor: 0.2});
+
+/**
+ * Bar envelope: one slow lift per bar line, for structural motion.
+ * This is the second rhythm layer — without it every shot ticks at beat rate
+ * and the film feels like a metronome instead of a song.
+ */
+const bar = (time: number, marks: BeatMark[], sharpness = 2): BeatHit =>
+  barPulse(time, marks, sharpness);
+
+/**
+ * Accent-scaled amplitude. `weak` is what a dead beat still does, `strong` is
+ * what the loudest beat in the song does. Never returns 0: SKILL.md requires a
+ * visible change on every beat.
+ */
+const lift = (pulse: BeatHit, weak: number, strong: number): number =>
+  weak + (strong - weak) * pulse.value;
+
+/**
+ * Density control for incidental motion (motes, birds, shimmer).
+ * Environment motion used to be constant, which is exactly why a 6.2x beat
+ * envelope only produced a 1.46x pixel difference: the drifting dust floor
+ * buried the accent. Scaling the ambience keeps the stage alive without
+ * flattening the rhythm.
+ */
+const ambience = (pulse: BeatHit, base: number): number =>
+  base * (0.72 + 0.55 * pulse.value);
 
 /* ------------------------------------------------------------------ */
 /* Shared set pieces                                                    */
@@ -120,17 +163,24 @@ export const WideHorizon: React.FC<ShotProps> = ({
   cam,
   palette,
   stage,
-  beats,
+  marks,
   intensity,
   seed,
+  composition,
 }) => {
   const {w, h} = stage;
-  const pulse = beatPulse(time, beats, 6);
-  const sunR = h * 0.118;
-  const sunX = w * 0.735;
-  const sunY = h * 0.545;
-  const horizon = h * 0.7;
-  const breathe = 1 + pulse * 0.015;
+  const pulse = hit(time, marks, 6);
+  const barHit = bar(time, marks, 2.2);
+  // Minor-dimension sizing: in 16:9 `m` == `h`, so these factors keep the
+  // landscape look identical while giving portrait the same physical object.
+  const sunR = stage.m * 0.118;
+  // Composition slots: the director decides where the eye lands, not the code.
+  // These are normalised, so a 9:16 render re-lays the shot instead of scaling it.
+  const horizon = h * composition.horizon;
+  const sunX = w * (0.45 + composition.focus * 0.42);
+  const sunY = horizon - h * 0.155;
+  // A kick pushes the sun out; a bar line adds a slow, structural climb.
+  const breathe = 1 + lift(pulse, 0.003, 0.024) + lift(barHit, 0, 0.01);
 
   return (
     <>
@@ -330,16 +380,23 @@ export const WideHorizon: React.FC<ShotProps> = ({
         })}
       </Parallax>
 
-      {/* light shaft from the sun to the cliff */}
+      {/* Light shaft from the sun to the water.
+          It used to be pinned to w*0.18-w*0.55 while the sun sat at 0.63w, so
+          the beam fell beside the sun as a hard-edged grey wedge. It now
+          originates at the sun and is built from nested wedges, which gives a
+          soft falloff instead of a visible outline. */}
       <Parallax cam={cam} depth={0.6} width={w} height={h}>
-        <path
-          d={`M ${sunX - sunR} ${sunY} L ${sunX + sunR} ${sunY} L ${w * 0.55} ${h * 0.95} L ${w * 0.18} ${h * 0.95} Z`}
-          fill="url(#pc-shaft)"
-          opacity={0.18}
-        />
+        {[1.95, 1.35, 0.85].map((k, i) => (
+          <path
+            key={i}
+            d={`M ${sunX - sunR * 0.55} ${sunY} L ${sunX + sunR * 0.55} ${sunY} L ${sunX + sunR * k} ${h * 0.97} L ${sunX - sunR * k} ${h * 0.97} Z`}
+            fill="url(#pc-shaft)"
+            opacity={0.055 + i * 0.022}
+          />
+        ))}
       </Parallax>
 
-      <Motes time={time} count={24} width={w} height={h} color={palette.light} opacity={0.22} seed={seed + 3} />
+      <Motes time={time} count={Math.round(24 * (0.7 + composition.density * 0.6))} width={w} height={h} color={palette.light} opacity={ambience(pulse, 0.22)} seed={seed + 3} />
     </>
   );
 };
@@ -353,14 +410,17 @@ export const Corridor: React.FC<ShotProps> = ({
   cam,
   palette,
   stage,
-  beats,
+  marks,
   intensity,
   seed,
+  composition,
 }) => {
   const {w, h} = stage;
-  const vpx = w * 0.55;
-  const vpy = h * 0.49;
-  const pulse = beatPulse(time, beats, 5);
+  // Vanishing point follows the composition slot: off-centre is a choice.
+  const vpx = w * (0.38 + composition.focus * 0.34);
+  const vpy = h * (composition.horizon - 0.19);
+  const pulse = hit(time, marks, 5);
+  const barHit = bar(time, marks, 1.6);
   const frames = 7;
 
   return (
@@ -421,7 +481,7 @@ export const Corridor: React.FC<ShotProps> = ({
         const innerY = y + thick;
         const innerW = halfW * 2 - thick * 2;
         const innerH = halfH * 2 - thick * 2;
-        const lit = Math.max(0, 1 - Math.abs(k - ((time * 0.12) % 1)) * 5) * pulse;
+        const lit = Math.max(0, 1 - Math.abs(k - ((time * 0.12) % 1)) * 5) * pulse.value;
         const fill = i % 2 === 0 ? palette.ink : palette.mid;
         return (
           <Parallax key={i} cam={cam} depth={depth} width={w} height={h}>
@@ -494,7 +554,7 @@ export const Corridor: React.FC<ShotProps> = ({
         {Array.from({length: 10}, (_, i) => {
           const x = w * (0.01 + i * 0.11) + signed(i, seed) * 26;
           const len = h * (0.12 + hash(i, seed) * 0.2);
-          const sway = Math.sin(time * 1.25 + i * 1.5) * (4 + pulse * 4);
+          const sway = Math.sin(time * 1.25 + i * 1.5) * (4 + lift(pulse, 0.4, 6) + lift(barHit, 0, 2));
           return (
             <path
               key={i}
@@ -517,7 +577,7 @@ export const Corridor: React.FC<ShotProps> = ({
         />
       </Parallax>
 
-      <Motes time={time} count={26} width={w} height={h} color={palette.light} opacity={0.32} seed={seed + 4} speed={0.6} />
+      <Motes time={time} count={Math.round(26 * (0.7 + composition.density * 0.6))} width={w} height={h} color={palette.light} opacity={ambience(pulse, 0.32)} seed={seed + 4} speed={0.6} />
     </>
   );
 };
@@ -531,18 +591,27 @@ export const WindowSilhouette: React.FC<ShotProps> = ({
   cam,
   palette,
   stage,
-  beats,
+  marks,
   intensity,
   seed,
+  composition,
 }) => {
   const {w, h} = stage;
-  const pulse = beatPulse(time, beats, 7);
-  const winX = w * 0.62;
+  const pulse = hit(time, marks, 7);
+  const barHit = bar(time, marks, 1.8);
+  // The window's horizontal position is a composition slot, not a constant.
+  const winX = w * (0.34 + composition.focus * 0.34);
   const winTop = h * 0.09;
-  const winW = w * 0.34;
-  const winH = h * 0.64;
+  // Bounded by the minor dimension so a portrait frame cannot grow a window
+  // taller than the film itself.
+  const winW = Math.min(w * 0.34, stage.m * 0.66);
+  const winH = Math.min(h * 0.64, stage.m * 0.9);
   const arc = winW / 2;
-  const beam = 1 + pulse * 0.02 + intensity * 0.03;
+  // The beam widens on a kick and holds wider across the bar. The amplitude
+  // here is deliberately visible (1.5%-9%), not the 0.4%-3.4% it used to be: a
+  // 4% change on a soft gradient reads as nothing at 1080p, which is how this
+  // shot ended up with four dead beats.
+  const beam = 1 + lift(pulse, 0.015, 0.09) + lift(barHit, 0, 0.05) + intensity * 0.03;
 
   const windowPath = `M ${winX - winW / 2} ${winTop + winH}
     L ${winX - winW / 2} ${winTop + arc}
@@ -589,9 +658,9 @@ export const WindowSilhouette: React.FC<ShotProps> = ({
           <path d={`M ${winX - winW} ${winTop + winH * 0.74} Q ${winX} ${winTop + winH * 0.71} ${winX + winW} ${winTop + winH * 0.75} L ${winX + winW} ${winTop + winH} L ${winX - winW} ${winTop + winH} Z`} fill={palette.near} filter="url(#pc-torn)" />
           <path d={`M ${winX - winW} ${winTop + winH * 0.73} L ${winX + winW} ${winTop + winH * 0.72}`} stroke={palette.light} strokeWidth={2} opacity={0.3} />
           {Array.from({length: 6}, (_, i) => {
-            const bx = winX - winW * 0.36 + i * winW * 0.14;
-            const by = winTop + winH * (0.22 + (i % 3) * 0.035) + Math.sin(time + i) * 4;
-            const flap = Math.sin(time * 2.6 + i) * 2.5;
+            const bx = winX - winW * 0.36 + i * winW * 0.14 + Math.sin(time * 0.8 + i * 2.1) * 9;
+            const by = winTop + winH * (0.22 + (i % 3) * 0.035) + Math.sin(time * 1.4 + i) * 10;
+            const flap = Math.sin(time * 3 + i) * 5;
             return <path key={i} d={`M ${bx - 7} ${by} q 7 ${-6 - flap} 7 0 q 0 ${-6 + flap} 7 0`} fill="none" stroke={palette.inkSoft} strokeWidth={2} opacity={0.5} />;
           })}
         </g>
@@ -613,7 +682,17 @@ export const WindowSilhouette: React.FC<ShotProps> = ({
           fill="url(#pc-shaft)"
           opacity={0.9}
         />
-        <ellipse cx={winX} cy={h * 0.94} rx={winW * 0.5 * beam} ry={h * 0.045} fill={palette.glow} opacity={0.16} filter="url(#pc-haze)" />
+        {/* the outside sky brightens on the beat: a wide, soft area that moves */}
+        <rect
+          x={winX - winW}
+          y={winTop - winW}
+          width={winW * 2}
+          height={winH + winW * 2}
+          fill={palette.glow}
+          opacity={0.05 + lift(pulse, 0.02, 0.16) * 0.5}
+          clipPath={`url(#wi-clip-${seed})`}
+        />
+        <ellipse cx={winX} cy={h * 0.94} rx={winW * 0.5 * beam} ry={h * 0.045} fill={palette.glow} opacity={0.16 + lift(pulse, 0.02, 0.18)} filter="url(#pc-haze)" />
         <rect x={0} y={h * 0.86} width={w} height={h * 0.16} fill={palette.ink} opacity={0.92} filter="url(#pc-torn)" />
       </Parallax>
 
@@ -629,7 +708,7 @@ export const WindowSilhouette: React.FC<ShotProps> = ({
           {Array.from({length: 5}, (_, i) => {
             const dx = (i - 2) * h * 0.035;
             const top = -h * (0.14 + hash(i, seed) * 0.13);
-            const bend = Math.sin(time * 0.7 + i) * 3;
+            const bend = Math.sin(time * 0.9 + i) * 7;
             return (
               <g key={i}>
                 <path
@@ -710,7 +789,7 @@ export const WindowSilhouette: React.FC<ShotProps> = ({
           <path d="M -20 -8 L 20 -8 L 16 12 L -16 12 Z" fill={palette.paper} filter="url(#pc-torn-fine)" />
           <path d="M -30 12 L 30 12 L 34 20 L -34 20 Z" fill={palette.shade} />
           <path d="M -24 -40 Q 0 -46 24 -40" fill="none" stroke={palette.accent} strokeWidth={2} opacity={0.5} />
-          <path d={`M 0 -46 q ${-6 - pulse * 4} -22 ${2 - pulse * 8} -42`} fill="none" stroke={palette.paperWarm} strokeWidth={4} opacity={0.18} />
+          <path d={`M 0 -46 q ${-6 - lift(pulse, 0.6, 5)} -22 ${2 - lift(pulse, 1.2, 9)} -42`} fill="none" stroke={palette.paperWarm} strokeWidth={4} opacity={0.18} />
         </g>
         {/* book */}
         <g transform={`translate(${w * 0.64} ${h * 0.93}) rotate(-4)`}>
@@ -719,7 +798,7 @@ export const WindowSilhouette: React.FC<ShotProps> = ({
         </g>
       </Parallax>
 
-      <Motes time={time} count={30} width={w} height={h} color={palette.light} opacity={0.3} seed={seed + 6} speed={0.5} />
+      <Motes time={time} count={Math.round(46 * (0.7 + composition.density * 0.6))} width={w} height={h} color={palette.light} opacity={ambience(pulse, 0.34)} seed={seed + 6} speed={1.15} />
     </>
   );
 };
@@ -733,16 +812,22 @@ export const Iris: React.FC<ShotProps> = ({
   cam,
   palette,
   stage,
-  beats,
+  marks,
   intensity,
   seed,
+  composition,
 }) => {
   const {w, h} = stage;
-  const pulse = beatPulse(time, beats, 6);
-  const cx = w * 0.5;
-  const cy = h * 0.48;
-  const base = h * 0.27;
-  const open = 1 + pulse * 0.02 + intensity * 0.04;
+  const pulse = hit(time, marks, 6);
+  const barHit = bar(time, marks, 1.5);
+  // Where the memory opens: a composition slot, not the centre by default.
+  const cx = w * (0.34 + composition.focus * 0.32);
+  const cy = h * (composition.horizon - 0.16);
+  const base = stage.m * 0.27;
+  // The iris opens on a beat and keeps opening across the bar — the two layers
+  // together read as "the memory widens", not as a flicker.
+  const open =
+    1 + lift(pulse, 0.005, 0.03) + lift(barHit, 0, 0.022) + intensity * 0.04;
   const rings = 5;
 
   return (
@@ -832,7 +917,7 @@ export const Iris: React.FC<ShotProps> = ({
         <path d={tornPolygon([[w + 40, h + 40], [w * 0.76, h + 40], [w * 0.84, h * 0.8], [w + 40, h * 0.68]], 6, 40, seed + 8)} fill={palette.ink} opacity={0.9} filter="url(#pc-torn)" />
       </Parallax>
 
-      <Motes time={time} count={22} width={w} height={h} color={palette.light} opacity={0.24} seed={seed + 7} />
+      <Motes time={time} count={Math.round(22 * (0.7 + composition.density * 0.6))} width={w} height={h} color={palette.light} opacity={ambience(pulse, 0.24)} seed={seed + 7} />
     </>
   );
 };
@@ -846,14 +931,33 @@ export const ObjectMacro: React.FC<ShotProps> = ({
   cam,
   palette,
   stage,
-  beats,
+  marks,
   intensity,
   seed,
+  composition,
 }) => {
   const {w, h} = stage;
-  const pulse = beatPulse(time, beats, 8);
-  const sway = Math.sin(time * 0.9) * 2.2;
-  const cx = w * 0.4;
+  const pulse = hit(time, marks, 8);
+  const barHit = bar(time, marks, 2.4);
+  // v1 destructured `intensity` here and never read it — so the director's
+  // "this is the loudest shot" signal vanished on the one shot that deserved it.
+  // The object now scales and sways with both intensity and the bar.
+  const focusScale = 0.86 + intensity * 0.34;
+  // Amplitude raised deliberately. The old sway worked out to roughly one
+  // degree of rotation, i.e. a 1-2 px move at the petal tips, so four beats in
+  // this shot registered as dead. A macro shot lives on small but visible
+  // changes: the petals must actually travel.
+  const sway =
+    Math.sin(time * 0.9) * 2.2 +
+    lift(barHit, 0, 5.5) * (0.6 + intensity * 0.8) +
+    lift(pulse, 1.5, 9.0) * (0.6 + intensity * 0.8);
+  // A slow vertical breathing of the whole arrangement, so the shot has motion
+  // at macro scale and not only inside the flower.
+  const bob =
+    Math.sin(time * 1.1) * 2.5 +
+    lift(pulse, 0.8, 6.0) * (0.5 + intensity * 0.9) +
+    lift(barHit, 0, 3.0) * (0.5 + intensity * 0.9);
+  const cx = w * (0.28 + composition.focus * 0.28);
   const table = h * 0.78;
 
   const flower = (fx: number, fy: number, r: number, rot: number, color: string) => (
@@ -898,6 +1002,17 @@ export const ObjectMacro: React.FC<ShotProps> = ({
 
       <Parallax cam={cam} depth={0.1} width={w} height={h}>
         <circle cx={w * 0.78} cy={h * 0.24} r={h * 0.3} fill={`url(#om-lamp-${seed})`} />
+        {/* Wide luminance pulse. At macro scale the composition is mostly soft
+            gradient, so a small object sway alone moves too few pixels to
+            register as a beat. The lamp breathing lifts the whole frame. */}
+        <circle
+          cx={w * 0.78}
+          cy={h * 0.24}
+          r={h * 0.42}
+          fill={palette.glow}
+          opacity={0.03 + lift(pulse, 0.02, 0.14) + lift(barHit, 0, 0.06)}
+          filter="url(#pc-haze)"
+        />
         {Array.from({length: 14}, (_, i) => {
           const bx = w * (0.04 + hash(i, seed) * 0.92);
           const by = h * (0.03 + hash(i + 3, seed) * 0.5);
@@ -931,7 +1046,7 @@ export const ObjectMacro: React.FC<ShotProps> = ({
       </Parallax>
 
       <Parallax cam={cam} depth={0.72} width={w} height={h}>
-        <g transform={`translate(${cx} ${table})`}>
+        <g transform={`translate(${cx} ${table + bob}) scale(${focusScale})`}>
           {([[-26, -h * 0.28, -10], [8, -h * 0.33, 6], [30, -h * 0.23, 16]] as number[][]).map(([sx, sy, rot], i) => (
             <g key={i}>
               <path
@@ -964,7 +1079,7 @@ export const ObjectMacro: React.FC<ShotProps> = ({
           <path d="M -26 -54 L 26 -54 L 18 -8 L -18 -8 Z" fill={palette.paper} filter="url(#pc-torn-fine)" />
           <path d="M -20 -8 L 20 -8 L 16 10 L -16 10 Z" fill={palette.paper} filter="url(#pc-torn-fine)" />
           <path d="M -28 10 L 28 10 L 32 18 L -32 18 Z" fill={palette.shade} />
-          <path d={`M 0 -54 q ${-6 - pulse * 3} -22 ${2 - pulse * 7} -40`} fill="none" stroke={palette.paperWarm} strokeWidth={4} opacity={0.2} />
+          <path d={`M 0 -54 q ${-6 - lift(pulse, 0.5, 4)} -22 ${2 - lift(pulse, 1, 8)} -40`} fill="none" stroke={palette.paperWarm} strokeWidth={4} opacity={0.2} />
         </g>
       </Parallax>
 
@@ -972,7 +1087,7 @@ export const ObjectMacro: React.FC<ShotProps> = ({
         <path d={`M ${-w * 0.1} ${h * 1.08} L ${-w * 0.1} ${h * 0.94} Q ${w * 0.4} ${h * 0.9} ${w * 1.1} ${h * 0.95} L ${w * 1.1} ${h * 1.08} Z`} fill={palette.ink} filter="url(#pc-torn)" />
       </Parallax>
 
-      <Motes time={time} count={26} width={w} height={h} color={palette.light} opacity={0.34} seed={seed + 8} speed={0.7} />
+      <Motes time={time} count={Math.round(26 * (0.7 + composition.density * 0.6))} width={w} height={h} color={palette.light} opacity={ambience(pulse, 0.34)} seed={seed + 8} speed={0.7} />
     </>
   );
 };

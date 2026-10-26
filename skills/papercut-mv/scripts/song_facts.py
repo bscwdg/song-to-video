@@ -122,6 +122,144 @@ def estimate_meter(
     return best
 
 
+def tempo_octave_check(
+    y: np.ndarray,
+    sr: int,
+    hop: int,
+    bpm: float,
+    body_end: float,
+    margin: float = 1.35,
+) -> dict[str, Any]:
+    """Is the detected BPM the real beat, or a half/double-tempo mistake?
+
+    librosa.beat_track regularly locks onto the subdivision. money-girl reported
+    161.499 BPM with 7-9 beat shots — the signature of a half-tempo grid read at
+    double speed. v1 just divided by two and printed it; nothing verified.
+
+    Salience is measured on a tempogram: the mean tempo salience curve across
+    the whole track. If the energy peak sits at half the detected tempo, we are
+    counting subdivisions, not beats. Requiring a `margin` before flipping keeps
+    genuinely fast songs from being slowed down by noise.
+    """
+    onset_env = librosa.onset.onset_strength(y=y, sr=sr, hop_length=hop)
+    if len(onset_env) < 8:
+        return {"octave": "same", "reason": "too-short", "salience": {}}
+
+    tempogram = librosa.feature.tempogram(
+        onset_envelope=onset_env, sr=sr, hop_length=hop
+    )
+    bpms = librosa.tempo_frequencies(tempogram.shape[0], sr=sr, hop_length=hop)
+    salience = np.mean(tempogram, axis=1)
+
+    def at(target: float) -> float:
+        if target <= 0:
+            return 0.0
+        index = int(np.argmin(np.abs(bpms - target)))
+        return float(salience[index])
+
+    half = bpm / 2.0
+    double = bpm * 2.0
+    s_half, s_same, s_double = at(half), at(bpm), at(double)
+    total = max(s_half + s_same + s_double, 1e-9)
+
+    octave = "same"
+    reason = "salience-agrees"
+    if s_half > s_same * margin and s_half >= s_double:
+        octave, reason = "half", "salience-favours-half"
+    elif s_double > s_same * margin and s_double > s_half:
+        octave, reason = "double", "salience-favours-double"
+
+    # Independent witness: do the detected beats actually land on onsets?
+    onset_times = librosa.frames_to_time(
+        np.arange(len(onset_env)), sr=sr, hop_length=hop
+    )
+    grid = np.arange(0.0, body_end, 60.0 / max(bpm, 1e-6))
+    if len(grid) and len(onset_times):
+        hits = 0
+        for t in grid:
+            near = onset_env[(onset_times >= t - 0.03) & (onset_times <= t + 0.03)]
+            if len(near) and float(np.max(near)) > float(np.percentile(onset_env, 55)):
+                hits += 1
+        coverage = hits / len(grid)
+    else:
+        coverage = 0.0
+
+    return {
+        "octave": octave,
+        "reason": reason,
+        "confidence": round(max(s_half, s_same, s_double) / total, 4),
+        "beatCoverage": round(float(coverage), 4),
+        "salience": {
+            "half": round(s_half / total, 4),
+            "same": round(s_same / total, 4),
+            "double": round(s_double / total, 4),
+        },
+        "halfBpm": round(half, 4),
+        "doubleBpm": round(double, 4),
+    }
+
+
+def decimate_beats(
+    beat_times: np.ndarray,
+    low: np.ndarray,
+    beat_index: np.ndarray,
+) -> np.ndarray:
+    """Keep every second beat, choosing the phase with the strongest low end.
+
+    If the grid is a subdivision, the true beats are a subset — not a new
+    estimate. Subsampling preserves the measured positions exactly, so every
+    beat stays on a real onset instead of being re-guessed.
+    """
+    if len(beat_times) < 4:
+        return beat_times
+    best_phase, best_score = 0, -1.0
+    for phase in (0, 1):
+        idx = beat_index[phase::2]
+        if len(idx) < 2:
+            continue
+        score = float(np.mean(low[idx]))
+        if score > best_score:
+            best_phase, best_score = phase, score
+    return beat_times[best_phase::2]
+
+
+def beat_strengths(
+    low: np.ndarray,
+    flux: np.ndarray,
+    rms: np.ndarray,
+    beat_index: np.ndarray,
+    is_downbeat: list[bool],
+) -> list[float]:
+    """How hard does this beat actually hit? 0 = empty, 1 = the loudest in the song.
+
+    v1 only had `beats[]`, so every beat drove the same visual decay. This turns
+    the per-beat spectrum into one scalar the renderer can scale amplitude by.
+    Low end dominates (kick/bass), flux carries transients, rms keeps quiet
+    sections from reading as accents.
+    """
+    raw = np.zeros(len(beat_index), dtype=float)
+    for position, index in enumerate(beat_index):
+        raw[position] = (
+            float(low[index]) * 0.45
+            + float(flux[index]) * 0.30
+            + float(rms[index]) * 0.25
+        )
+    if len(raw) == 0:
+        return []
+    low_ref = float(np.percentile(raw, 8))
+    high_ref = float(np.percentile(raw, 92))
+    span = max(high_ref - low_ref, 1e-6)
+    strengths: list[float] = []
+    for position, value in enumerate(raw):
+        strength = (float(value) - low_ref) / span
+        strength = max(0.0, min(1.0, strength))
+        # A downbeat is an edit point: mark it even when the low end is soft.
+        if is_downbeat[position]:
+            strength = min(1.0, strength * 1.22 + 0.08)
+        strengths.append(round(strength, 4))
+    return strengths
+
+
 def estimate_sections(
     bar_energy: list[float],
     bar_chroma: list[list[float]],
@@ -204,6 +342,12 @@ def main() -> None:
     parser.add_argument("--height", type=int, default=1080)
     parser.add_argument("--sr", type=int, default=22050)
     parser.add_argument("--body-end", type=float)
+    parser.add_argument(
+        "--tempo-mode",
+        choices=("auto", "keep"),
+        default="auto",
+        help="auto: halve the grid when salience says it is a subdivision; keep: trust librosa",
+    )
     args = parser.parse_args()
 
     y, sr = librosa.load(args.audio, sr=args.sr, mono=True)
@@ -237,6 +381,30 @@ def main() -> None:
     )
 
     features = frame_features(y, sr, hop)
+
+    # Octave check runs before anything derives a grid from bpm.
+    detected_bpm = bpm
+    octave = tempo_octave_check(y, sr, hop, bpm, body_end)
+    if args.tempo_mode == "keep":
+        octave["octave"] = "same"
+        octave["reason"] = "mode-keep"
+    if octave["octave"] == "half":
+        probe_index = np.clip(
+            np.round(beat_times * sr / hop).astype(int), 0, len(features["low"]) - 1
+        )
+        reduced = decimate_beats(beat_times, features["low"], probe_index)
+        if len(reduced) >= 2:
+            beat_times = reduced
+            bpm = bpm / 2.0
+    elif octave["octave"] == "double":
+        # Do not invent subdivisions: keep the measured grid, but record the doubt.
+        octave["reason"] = "salience-favours-double-kept-grid"
+
+    if len(beat_times) >= 2:
+        intervals = np.diff(beat_times)
+        beat_confidence = float(
+            max(0.0, 1.0 - (np.std(intervals) / max(np.mean(intervals), 1e-6)))
+        )
     y_harm = librosa.effects.hpss(y)[0]
     harm_rms = librosa.feature.rms(y=y_harm, frame_length=2048, hop_length=hop)[0]
     harm_peak = float(np.max(harm_rms)) if len(harm_rms) else 0.0
@@ -264,6 +432,13 @@ def main() -> None:
         frame_to = int(np.clip(bar_end * sr / hop, frame_from + 1, chroma.shape[1]))
         bar_chroma.append(np.mean(chroma[:, frame_from:frame_to], axis=1).tolist())
 
+    downbeat_flags = [
+        index >= phase and (index - phase) % meter == 0 for index in range(len(beat_times))
+    ]
+    strengths = beat_strengths(
+        features["low"], features["flux"], features["rms"], beat_index, downbeat_flags
+    )
+
     beat_features: list[dict[str, Any]] = []
     for index, time in enumerate(beat_times):
         sample_index = int(beat_index[index])
@@ -272,16 +447,32 @@ def main() -> None:
                 "t": round(float(time), 4),
                 "bar": int((index - phase) // meter) if index >= phase else 0,
                 "beatInBar": int((index - phase) % meter) if index >= phase else 0,
-                "isDownbeat": index >= phase and (index - phase) % meter == 0,
+                "isDownbeat": downbeat_flags[index],
                 "rms": round(float(features["rms"][sample_index]), 4),
                 "low": round(float(features["low"][sample_index]), 4),
                 "mid": round(float(features["mid"][sample_index]), 4),
                 "high": round(float(features["high"][sample_index]), 4),
                 "flux": round(float(features["flux"][sample_index]), 4),
+                "strength": strengths[index],
             }
         )
 
     sections = estimate_sections(bar_energy, bar_chroma, bar_times, body_end)
+
+    # Tag every beat with the section it belongs to. Without this the renderer
+    # cannot tell a verse beat from a chorus beat, so "the chorus should hit
+    # harder" stays a note in a markdown file instead of a render decision.
+    def section_at(t: float) -> dict[str, Any] | None:
+        for section in sections:
+            if float(section["start"]) - 1e-6 <= t < float(section["end"]) + 1e-6:
+                return section
+        return sections[-1] if sections else None
+
+    for row in beat_features:
+        owner = section_at(float(row["t"]))
+        row["section"] = owner["label"] if owner else "verse"
+        row["sectionEnergy"] = round(float(owner["energy"]), 4) if owner else 0.0
+
     lyrics = parse_lrc_lines(args.lrc, body_end)
     phrases = phrase_groups(lyrics)
 
@@ -295,12 +486,19 @@ def main() -> None:
         "height": args.height,
         "tempo": {
             "bpm": round(bpm, 4),
+            "detectedBpm": round(detected_bpm, 4),
             "halfTempoBpm": round(bpm / 2, 4),
             "beatSeconds": round(60.0 / bpm, 6),
             "confidence": round(beat_confidence, 4),
+            "octave": octave.get("octave", "same"),
+            "octaveReason": octave.get("reason", ""),
+            "octaveConfidence": octave.get("confidence", 0.0),
+            "beatCoverage": octave.get("beatCoverage", 0.0),
+            "salience": octave.get("salience", {}),
         },
         "meter": meter,
         "downbeatPhase": phase,
+        "strengthMean": round(float(np.mean(strengths)) if strengths else 0.0, 4),
         "meterScore": round(meter_score, 4),
         "beats": [round(float(t), 4) for t in beat_times],
         "downbeats": downbeats,
