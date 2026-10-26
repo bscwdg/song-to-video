@@ -7,7 +7,8 @@ These test the properties that actually broke, not the visuals:
 * beat accents are normalised, and a downbeat is marked even on a soft kick
 * the QA's dead-beat rule is relative to the film, not a magic number
 
-Runs with the stdlib only:  python -m unittest discover -s tests
+Runs with the stdlib only:
+  python -m unittest discover -s experiments/v2-engine/tests
 """
 
 from __future__ import annotations
@@ -18,8 +19,10 @@ import sys
 import unittest
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[1]
-SCRIPTS = REPO / "skills" / "papercut-mv" / "scripts"
+REPO = Path(__file__).resolve().parents[3]
+SKILL_SCRIPTS = REPO / "skills" / "papercut-mv" / "scripts"
+SCRIPTS = REPO / "experiments" / "v2-engine" / "scripts"
+sys.path.insert(0, str(SKILL_SCRIPTS))
 sys.path.insert(0, str(SCRIPTS))
 
 
@@ -28,7 +31,7 @@ class ScriptMirrorTest(unittest.TestCase):
 
     def test_mirrors_match_canonical(self):
         result = subprocess.run(
-            [sys.executable, str(SCRIPTS / "sync_scripts.py"), "--check"],
+            [sys.executable, str(SKILL_SCRIPTS / "sync_scripts.py"), "--check"],
             capture_output=True,
             text=True,
         )
@@ -323,7 +326,7 @@ class GeometryTest(unittest.TestCase):
     """Composition slots must stay inside the frame in both aspects."""
 
     def test_slot_x_in_portrait_stays_in_frame(self):
-        sys.path.insert(0, str(REPO / "examples" / "v2-lab"))
+        sys.path.insert(0, str(REPO / "experiments" / "v2-engine"))
         # stage.ts is TS; mirror its rule here to pin the intent.
         def slot_x(w, h, focus):
             m_spread = 0.62 if w < h else 1.0

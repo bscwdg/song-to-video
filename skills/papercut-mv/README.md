@@ -15,10 +15,13 @@ references/style-dna.md
 references/composition-matrix.md
 references/audio-sync.md
 references/qa.md
+references/storyboard-schema.json
 scripts/analyze_track.py
 scripts/generate_sfx.py
 scripts/qa_video.py
 scripts/contact_sheet.py
+scripts/validate_storyboard.py
+scripts/storyboard_to_timeline.py
 template/
 examples/paper-tide/
 ```
@@ -29,11 +32,28 @@ examples/paper-tide/
 
 - 2.5D 剪纸层；
 - 拍点驱动的动作；
-- 九镜构图去重；
+- 镜头构图去重；
 - 纸感音效与字幕位置；
 - Remotion/SVG 的渲染陷阱。
 
-真正可变的只有歌曲、歌词、角色造型、九镜的具体故事与色彩。
+真正可变的只有歌曲、歌词、角色造型、具体故事与色彩。
+
+## 主路径
+
+不要把镜号取模当作叙事。先写 `storyboard.json`，把每组歌词绑定到：
+
+- `intent`：这句在讲什么
+- `metaphor`：观众具体看到什么
+- `scene`：构图、主体、机位、色板、动作、转场
+
+验证命令：
+
+```powershell
+python scripts\validate_storyboard.py storyboard.json
+```
+
+格式见 [`references/storyboard-schema.json`](references/storyboard-schema.json)，
+完整说明见仓库 [`docs/STORYBOARD_SPEC.md`](../../docs/STORYBOARD_SPEC.md)。
 
 ## 使用方式
 

@@ -15,7 +15,7 @@ import numpy as np
 
 SR = 44_100
 # Default output stays inside the skill package; --out-dir lets a project (e.g.
-# examples/v2-lab) receive the cues so the film can actually play them.
+# experiments/v2-engine) receive the cues so the film can actually play them.
 OUT = Path(__file__).resolve().parents[1] / "public" / "sfx"
 OUT.mkdir(parents=True, exist_ok=True)
 RNG = np.random.default_rng(2600)

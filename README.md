@@ -1,62 +1,63 @@
 # song-to-video
 
-把一首歌生成一支按真实拍点剪辑的动态视频。
+输入一首歌，选择片段，按歌词语义生成分镜和画面，最后合成一支有内容的卡点视频。
 
-输入歌曲、歌词和视觉风格，输出：
-
-- 实测 BPM、拍点和音乐正文边界
-- 吸附到真实拍点的场景切分
-- 可直接渲染的 Remotion 时间轴
-- 程序化生成的画面、字幕和音效
-- 编码、分辨率、帧率、时长与接触表 QA
-
-当前已实现第一套视觉风格：**层叠剪纸**（`papercut-mv`）。
-
-## 当前状态
-
-这是一个可运行的工程骨架，不是“任意歌曲一键出片”的最终产品。
-
-- 歌曲分析、拍点吸附、时间轴生成、Remotion 渲染、QA 已跑通
-- 场景美术仍需按 visual style / storyboard 实现
-- 目前只内置 16:9 剪纸模板；竖屏及其他风格需要单独设计
-- 示例歌曲仅用于本地验证，不随仓库分发
-- **v2 参数化引擎实验**在 `examples/v2-lab`：5 个参数化构图、三层视差、关节纸偶、小节量化自动分镜；一条命令跑通 歌 → song.json → shots.json → 渲染
-
-## 工作流
+这个仓库当前只承诺一条主线：
 
 ```text
-audio + lyrics
-      ↓
-analyze_track.py  →  timing.json / timeline.generated.ts
-      ↓
-scene components + storyboard
-      ↓
-Remotion render
-      ↓
-qa_video.py + contact_sheet.py
+歌 + 可选歌词
+    → 选片段
+    → 歌词分组
+    → storyboard.json（intent + metaphor + scene）
+    → 人工确认
+    → 时间轴 codegen
+    → 场景实现
+    → 渲染 + QA
 ```
 
-使用方法和调用示例见 [docs/USAGE.md](docs/USAGE.md)，底层流程见 [docs/PIPELINE.md](docs/PIPELINE.md)。
+不是“任意歌曲一键出片”，也不是“镜头模板轮播”。
+
+## 当前主线
+
+- **稳定 skill**：`skills/papercut-mv`
+- **核心协议**：[docs/STORYBOARD_SPEC.md](docs/STORYBOARD_SPEC.md)
+- **产品边界**：[docs/PRODUCT.md](docs/PRODUCT.md)
+- **使用说明**：[docs/USAGE.md](docs/USAGE.md)
+- **4 镜质量标杆**：[examples/storyboard-first](examples/storyboard-first)
+
+`papercut-mv` 的职责是：
+
+- 测 BPM、拍点和音乐正文终点
+- 把切点吸附到真实拍点
+- 生成 Remotion 时间轴
+- 提供纸感材质、纸偶、字体和 QA 工具
+
+**它不负责替你想“这句歌词该画什么”。** 这一步必须由 Agent 提出、人工确认，写进 `storyboard.json`。
 
 ## 仓库结构
 
 ```text
 song-to-video/
 ├─ skills/
-│  └─ papercut-mv/          # 第一套视觉风格与可复用工程模板
-│     ├─ SKILL.md
-│     ├─ references/
-│     ├─ scripts/
-│     ├─ template/
-│     └─ examples/paper-tide/
+│  └─ papercut-mv/          # 稳定剪纸 skill
 ├─ examples/
-│  ├─ v2-lab/             # v2 参数化引擎：构图库 + 自动分镜
-│  ├─ papercut-song/        # 《纸潮》完整九镜实现
-│  └─ money-girl/           # 《数钱的女孩》32s 换歌测试
-└─ docs/
-   ├─ USAGE.md
-   └─ PIPELINE.md
+│  ├─ storyboard-first/     # 4 镜语义分镜合同
+│  ├─ money-girl/           # 手工剪纸案例
+│  └─ papercut-song/        # 早期九镜案例
+├─ experiments/
+│  ├─ v2-engine/            # 参数化引擎与 Seedream 样片，非主路径
+│  └─ README.md
+├─ docs/
+│  ├─ PRODUCT.md
+│  ├─ STORYBOARD_SPEC.md
+│  ├─ USAGE.md
+│  ├─ PIPELINE.md
+│  └─ research/             # 历史审查、需求、问题记录
+├─ tests/
+└─ .github/workflows/
 ```
+
+`experiments/` 里的东西可以保留、可以失败，但不进入稳定 skill 的默认答案。
 
 ## 快速开始
 
@@ -65,26 +66,46 @@ Copy-Item skills\papercut-mv\template examples\my-song -Recurse
 cd examples\my-song
 npm install
 python -m pip install -r requirements.txt
-
-python scripts\analyze_track.py public\audio\song.mp3 `
-  --cuts 3.6,5.7,7.4 `
-  --scene-components world,split,world `
-  --scene-names 起航,离开,尾声 `
-  --out timing.json `
-  --emit-ts src\generated\timeline.generated.ts
-
-npm run typecheck
-npx remotion render src\index.ts PaperCutMV out\papercut-mv.mp4 `
-  --codec=h264 --crf=16 --pixel-format=yuv420p
 ```
+
+1. 放入歌曲：`public/audio/song.mp3`
+2. 放入歌词：`lyrics.lrc`
+3. 先写 `storyboard.json`，不要直接写九个场景
+4. 验证分镜：
+
+```powershell
+python ..\..\skills\papercut-mv\scripts\validate_storyboard.py storyboard.json
+```
+
+5. 生成实测时间数据，再由确认后的 storyboard 生成时间轴：
+
+```powershell
+python ..\..\skills\papercut-mv\scripts\analyze_track.py public\audio\song.mp3 `
+  --lrc lyrics.lrc --out timing.json
+
+python ..\..\skills\papercut-mv\scripts\storyboard_to_timeline.py `
+  timing.json storyboard.json `
+  --out-ts src\generated\timeline.generated.ts
+```
+
+6. 按确认后的 storyboard 实现场景，再 typecheck、渲染、QA。
 
 ## 设计原则
 
-1. **实测拍点是唯一时间真相。** 不在场景里另算一套 BPM 网格。
-2. **模板与案例分离。** 模板不包含某一首歌的歌词、切点和导演内容。
-3. **画面是时间的纯函数。** 不使用 `Date.now()` 或逐帧随机数。
-4. **先看画面，再谈完成。** 每个镜头至少检查一张静帧和关键动作。
-5. **代码正确不等于片子成立。** 构图、可读性和节奏仍需人工审查。
+1. **先语义，后画面。** 没有 `intent` 和 `metaphor`，不写场景代码。
+2. **实测拍点是唯一时间真相。** 不在场景里另算一套 BPM 网格。
+3. **一镜一构图，一镜一动作。** 不用镜号取模伪装叙事。
+4. **模板与案例分离。** 模板不包含某一首歌的歌词、切点和导演内容。
+5. **先看画面，再谈完成。** 自动 QA 不能判断歌词和画面是否相关。
+6. **实验不污染主路径。** v2 引擎、Seedream、自动导演先留在 `experiments/`。
+
+## 当前不做
+
+- 任意歌曲无人值守一键出片
+- 用词表覆盖率代替导演理解
+- 先扩 40 个意象库，再验证画面是否成立
+- 把 Seedream/Seedance 当作必需依赖
+- 用更多参数、更多镜头、更多 QA 指标掩盖语义缺失
 
 ## 媒体与版权
 
@@ -92,11 +113,9 @@ npx remotion render src\index.ts PaperCutMV out\papercut-mv.mp4 `
 
 `**/video/`、`**/public/audio/*`、`**/public/sfx/*`、`out/` 和常见音视频格式均已在 `.gitignore` 中排除。
 
-示例案例保留**实测时间数据**（BPM、拍点、歌词起唱时间、镜头切点），但**歌词正文已替换为长度占位**
-（例如 `〈歌词 01 · 12 字〉`）：字数驱动程序排版测试，原文不在分发范围内。
-若你本地有版权，把 `.lrc` 放回对应案例目录重新跑一遍 codegen 即可恢复。
+`**/storyboard.json` 默认也被忽略，因为它通常包含歌词正文；只有 `examples/storyboard-first/storyboard.json` 这份示例被显式保留。
 
-示例歌曲与歌词版权归原权利人，仓库中的示例仅用于技术验证。
+示例案例保留实测时间数据，但歌词正文使用长度占位；原文仅在本地使用。
 
 ## License
 

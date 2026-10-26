@@ -17,6 +17,8 @@ __pycache__/
 # User media and rendered video: never commit these
 **/video/
 **/videos/
+**/storyboard.json
+!examples/storyboard-first/storyboard.json
 **/public/audio/*
 !**/public/audio/README.md
 **/public/sfx/*

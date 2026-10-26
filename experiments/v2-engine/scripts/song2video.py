@@ -2,11 +2,11 @@
 """One-command entry: song -> song.json -> shots.json -> generated film.
 
 Examples:
-  python song2video.py song.mp3 --lrc lyrics.lrc --project examples/v2-lab
-  python song2video.py song.mp3 --project examples/v2-lab --render
+  python song2video.py song.mp3 --lrc lyrics.lrc --project experiments/v2-engine
+  python song2video.py song.mp3 --project experiments/v2-engine --render
 
 The project must be a Remotion project containing src/engine and V2Song
-(the v2-lab is the reference project). The song is copied into
+(this experiment is the reference project). The song is copied into
 <project>/public/audio/ so Remotion can serve it.
 """
 
@@ -20,7 +20,7 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-REPO = HERE.parents[2]
+REPO = HERE.parents[3]
 
 
 def resolve_executable(name: str) -> str:

@@ -1,6 +1,8 @@
 node_modules/
 out/
 *.log
+storyboard.json
+lyrics.lrc
 public/audio/*
 !public/audio/README.md
 public/sfx/*.wav

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/bscwdg/song-to-video/storyboard-schema.json",
+  "title": "song-to-video storyboard",
+  "type": "object",
+  "required": ["version", "title", "fps", "duration", "shots"],
+  "additionalProperties": true,
+  "properties": {
+    "version": {"const": 1},
+    "title": {"type": "string", "minLength": 1},
+    "fps": {"type": "number", "exclusiveMinimum": 0},
+    "duration": {"type": "number", "exclusiveMinimum": 0},
+    "segment": {
+      "type": "object",
+      "required": ["start", "end"],
+      "properties": {
+        "start": {"type": "number", "minimum": 0},
+        "end": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "shots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "start", "end", "intent", "metaphor", "scene", "lyrics"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "start": {"type": "number", "minimum": 0},
+          "end": {"type": "number", "exclusiveMinimum": 0},
+          "intent": {"type": "string", "minLength": 1},
+          "metaphor": {"type": "string", "minLength": 1},
+          "cut": {
+            "type": "object",
+            "properties": {
+              "requested": {"type": "number"},
+              "snapped": {"type": "number"},
+              "beatIndex": {"type": "integer", "minimum": 0}
+            }
+          },
+          "scene": {
+            "type": "object",
+            "required": ["archetype", "subject", "camera", "palette", "motion", "transition"],
+            "properties": {
+              "archetype": {"type": "string", "minLength": 1},
+              "subject": {
+                "type": "array",
+                "minItems": 1,
+                "items": {"type": "string", "minLength": 1}
+              },
+              "camera": {"type": "string", "minLength": 1},
+              "palette": {"type": "string", "minLength": 1},
+              "motion": {"type": "string", "minLength": 1},
+              "transition": {"type": "string", "minLength": 1}
+            }
+          },
+          "lyrics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["start", "end", "text"],
+              "properties": {
+                "start": {"type": "number", "minimum": 0},
+                "end": {"type": "number", "exclusiveMinimum": 0},
+                "text": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

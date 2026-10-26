@@ -1,11 +1,12 @@
 # Pipeline
 
-`song-to-video` 把歌曲生成视频拆成五个可验证阶段。
+`song-to-video` 把歌曲生成视频拆成六个可验证阶段。
 
 ## 1. 声音事实
 
 ```powershell
 python skills/papercut-mv/scripts/analyze_track.py song.mp3 `
+  --lrc lyrics.lrc `
   --out timing.json
 ```
 
@@ -18,20 +19,39 @@ python skills/papercut-mv/scripts/analyze_track.py song.mp3 `
 
 音乐正文与文件总时长必须分开。文件尾部的静音、UI 提示音或孤立尾音不应自动算进 MV。
 
-## 2. 结构切分
+## 2. 歌词 → 分镜
+
+在写任何场景代码前，先把歌词分组并写成 `storyboard.json`：
 
 ```powershell
-python skills/papercut-mv/scripts/analyze_track.py song.mp3 `
-  --cuts 3.6,5.7,7.4 `
-  --scene-components world,split,world `
-  --scene-names 启航,离开,尾声 `
-  --out timing.json `
-  --emit-ts src/generated/timeline.generated.ts
+python skills/papercut-mv/scripts/validate_storyboard.py `
+  examples/storyboard-first/storyboard.json
 ```
 
-切点先接受人工给出的粗略秒数，再吸附到最近的实测拍点。最终场景边界只从 `timing.json` 读取。
+每个镜头必须填写：
 
-## 3. 时间轴代码生成
+- `intent`：这句歌词在讲什么
+- `metaphor`：观众具体看到什么
+- `scene.archetype / subject / camera / palette / motion / transition`
+- `lyrics`：归属到该镜头的歌词行
+
+详细字段见 [STORYBOARD_SPEC.md](STORYBOARD_SPEC.md)。
+
+## 3. Storyboard → 时间轴
+
+```powershell
+python skills/papercut-mv/scripts/storyboard_to_timeline.py `
+  timing.json storyboard.json `
+  --out-ts src/generated/timeline.generated.ts
+```
+
+`storyboard_to_timeline.py` 会再次校验 `storyboard.json`，并要求它的
+`duration` 与 `timing.json` 的 `musical_body_end` 对齐。
+
+生成的 `scenes[].component` 来自 `storyboard.shots[].scene.archetype`，
+`lyrics[]` 来自每镜的歌词归属。最终场景边界只从确认后的 storyboard 读取。
+
+## 4. 时间轴代码生成
 
 `timing.json` 不是备注文件，而是场景和动画的时间源。
 
@@ -47,7 +67,7 @@ python skills/papercut-mv/scripts/analyze_track.py song.mp3 `
 
 禁止在场景里手写另一套 `BPM + offset + index` 网格。
 
-## 4. 画面与声音
+## 5. 画面与声音
 
 每个场景只承担一个主要视觉动作。纸媒介动作优先使用：
 
@@ -57,7 +77,7 @@ python skills/papercut-mv/scripts/analyze_track.py song.mp3 `
 
 SFX 由 `generate_sfx.py` 生成，通过 cue 表进入同一条时间轴。BGM 为主，SFX 音量保持克制。
 
-## 5. 渲染与 QA
+## 6. 渲染与 QA
 
 ```powershell
 npx remotion render src/index.ts PaperCutMV out/papercut-mv.mp4 `

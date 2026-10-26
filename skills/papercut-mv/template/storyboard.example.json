@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "title": "storyboard-first · 4-shot quality gate",
+  "segment": {
+    "start": 0,
+    "end": 16
+  },
+  "fps": 30,
+  "duration": 16,
+  "shots": [
+    {
+      "id": "01",
+      "start": 0,
+      "end": 4,
+      "intent": "她终于等到这一天，愿望成真。",
+      "metaphor": "纸门打开，婚礼拱门下落下纸钞雨。",
+      "cut": {
+        "requested": 4,
+        "snapped": 4,
+        "beatIndex": 10
+      },
+      "scene": {
+        "archetype": "wedding-arch",
+        "subject": ["bride", "groom", "banknotes"],
+        "camera": "low angle, slow push-in",
+        "palette": "rose-gold",
+        "motion": "one banknote layer descends per beat",
+        "transition": "paper tear"
+      },
+      "lyrics": [
+        {
+          "start": 0.5,
+          "end": 3.4,
+          "text": "她终于等到这一天"
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "start": 4,
+      "end": 8,
+      "intent": "旧日的自己仍住在拥挤的房间里。",
+      "metaphor": "旧我背对镜头，房间里的人影每拍增加一个。",
+      "cut": {
+        "requested": 8,
+        "snapped": 8,
+        "beatIndex": 21
+      },
+      "scene": {
+        "archetype": "room-fill",
+        "subject": ["old-self", "guests", "room"],
+        "camera": "wide interior, slow lateral drift",
+        "palette": "amber-ink",
+        "motion": "one paper guest appears per beat",
+        "transition": "hard cut"
+      },
+      "lyrics": [
+        {
+          "start": 4.5,
+          "end": 7.3,
+          "text": "旧日的自己还留在屋里"
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "start": 8,
+      "end": 12,
+      "intent": "把第一杯敬给家人，承认自己被托住。",
+      "metaphor": "四把纸椅围住长桌，四只纸杯依次举起。",
+      "cut": {
+        "requested": 12,
+        "snapped": 12,
+        "beatIndex": 32
+      },
+      "scene": {
+        "archetype": "family-table",
+        "subject": ["four-parents", "cups", "table"],
+        "camera": "low tabletop profile",
+        "palette": "wine-gold",
+        "motion": "cups rise on the first four beats",
+        "transition": "paper curtain"
+      },
+      "lyrics": [
+        {
+          "start": 8.4,
+          "end": 11.2,
+          "text": "第一杯先敬家人"
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "start": 12,
+      "end": 16,
+      "intent": "离开旧我，走进新的生活。",
+      "metaphor": "纸门透出金光，旧剪影穿过门槛后消融。",
+      "cut": {
+        "requested": 16,
+        "snapped": 16,
+        "beatIndex": 43
+      },
+      "scene": {
+        "archetype": "paper-door",
+        "subject": ["old-self", "doorway", "light"],
+        "camera": "centered wide shot, slow dolly-in",
+        "palette": "night-gold",
+        "motion": "old silhouette crosses the threshold and fades",
+        "transition": "fade out"
+      },
+      "lyrics": [
+        {
+          "start": 12.3,
+          "end": 15.4,
+          "text": "然后走向新的生活"
+        }
+      ]
+    }
+  ]
+}

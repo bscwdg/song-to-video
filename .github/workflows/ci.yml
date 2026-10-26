@@ -22,9 +22,11 @@ jobs:
         run: python skills/papercut-mv/scripts/sync_scripts.py --check
       - name: Compile every pipeline script
         run: |
-          python -m compileall -q skills/papercut-mv/scripts tests
+          python -m compileall -q skills/papercut-mv/scripts experiments/v2-engine/scripts tests
       - name: Pipeline tests
-        run: python -m unittest discover -s tests -v
+        run: |
+          python -m unittest discover -s tests -v
+          python -m unittest discover -s experiments/v2-engine/tests -v
 
   remotion:
     runs-on: ubuntu-latest
@@ -34,8 +36,8 @@ jobs:
         with:
           node-version: "20"
       - name: Install
-        working-directory: examples/v2-lab
+        working-directory: experiments/v2-engine
         run: npm ci --include=dev
       - name: Typecheck
-        working-directory: examples/v2-lab
+        working-directory: experiments/v2-engine
         run: npx tsc --noEmit

@@ -77,7 +77,7 @@ def find_tool(name: str) -> str | None:
 
     # Then downward: a repo root holding several projects, each with its own
     # node_modules, is a normal layout and the bundled ffmpeg lives there.
-    # One level is not enough (repo/examples/v2-lab/node_modules), so walk two.
+    # One level is not enough (repo/experiments/v2-engine/node_modules), so walk two.
     def walk_down(root: Path, depth: int) -> str | None:
         if depth <= 0 or not root.is_dir():
             return None

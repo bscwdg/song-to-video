@@ -1,6 +1,10 @@
-# v2-lab · 参数化剪纸 MV 引擎
+# v2-engine · 参数化剪纸 MV 实验
 
-这是 `v0.1` 之后的一次结构性重写，目标是两件事：
+> **这是实验区，不是 `song-to-video` 的稳定主路径。**
+> 稳定主线是“歌词/语义 → 分镜 → 画面”，见仓库根目录 README 和
+> [`docs/STORYBOARD_SPEC.md`](../../docs/STORYBOARD_SPEC.md)。
+
+这是一次结构性原型，目标是两件事：
 
 1. **画面**：从“每首歌手写九个场景”变成“镜头语法 + 参数化构图”；
 2. **流程**：从“人给切点”变成“歌 → song.json → shots.json → 成片”。
@@ -22,10 +26,10 @@ song.mp3 + lyrics.lrc
 ## 一条命令跑完
 
 ```powershell
-python skills\papercut-mv\scripts\song2video.py `
+python experiments\v2-engine\scripts\song2video.py `
   D:\music\song.mp3 `
   --lrc D:\music\song.lrc `
-  --project examples\v2-lab `
+  --project experiments\v2-engine `
   --render
 ```
 
@@ -34,30 +38,30 @@ python skills\papercut-mv\scripts\song2video.py `
 ## 快速验证（不需要真实歌曲）
 
 ```powershell
-cd examples\v2-lab
+cd experiments\v2-engine
 python scripts\make_test_song.py
 cd ..\..
 
-python skills\papercut-mv\scripts\song_facts.py `
-  examples\v2-lab\public\audio\test.wav `
-  --out examples\v2-lab\song.json
+python experiments\v2-engine\scripts\song_facts.py `
+  experiments\v2-engine\public\audio\test.wav `
+  --out experiments\v2-engine\song.json
 
-python skills\papercut-mv\scripts\direct.py `
-  examples\v2-lab\song.json `
-  --out examples\v2-lab\shots.json `
-  --storyboard examples\v2-lab\STORYBOARD.auto.md `
-  --emit-ts examples\v2-lab\src\generated\shots.generated.ts
+python experiments\v2-engine\scripts\direct.py `
+  experiments\v2-engine\song.json `
+  --out experiments\v2-engine\shots.json `
+  --storyboard experiments\v2-engine\STORYBOARD.auto.md `
+  --emit-ts experiments\v2-engine\src\generated\shots.generated.ts
 
-cd examples\v2-lab
+cd experiments\v2-engine
 npm run typecheck
 npx remotion render src\index.ts V2Song out\v2.mp4 `
   --codec=h264 --crf=16 --pixel-format=yuv420p `
   --browser-executable="C:\Program Files\Google\Chrome\Application\chrome.exe"
 ```
 
-## 这一版改了什么
+## 与稳定 skill 的差别
 
-| v0.1 | v0.2-lab |
+| 稳定 skill | 本实验 |
 |---|---|
 | 只有 BPM + beats | beats + downbeats + bars + sections + 逐拍 rms/low/mid/high/flux |
 | 切点吸“最近的拍” | 切点吸“小节线”，并在 1 小节内优先对齐到唱句终点（`phrases`） |

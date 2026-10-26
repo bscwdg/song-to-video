@@ -12,11 +12,17 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 from typing import Any
 
 import librosa
 import numpy as np
+
+REPO = Path(__file__).resolve().parents[3]
+SKILL_SCRIPTS = REPO / "skills" / "papercut-mv" / "scripts"
+if str(SKILL_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(SKILL_SCRIPTS))
 
 from analyze_track import estimate_body_end, parse_lrc
 

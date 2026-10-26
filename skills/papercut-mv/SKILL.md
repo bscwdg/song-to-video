@@ -1,6 +1,6 @@
 ---
 name: papercut-mv
-description: "用 Remotion + React + SVG 制作层叠剪纸动效音乐视频。适用于把用户提供的歌曲拆成 9 个左右不重复构图、按真实拍点剪辑、用纸偶/纸浪/纸云/孔明灯等程序化元素表演的 MV；也适用于从参考 MV 中逆向风格规则、节拍卡点、纸感音效与质检流程。关键词：剪纸 MV、paper-cut music video、Remotion 动画、歌词卡点、分层纸偶、paper stop-motion、程序化音效。"
+description: "用 Remotion + React + SVG 制作层叠剪纸动效音乐视频。适用于把用户提供的歌曲拆成 4–9 个不重复构图、按真实拍点剪辑、用纸偶/纸浪/纸云/孔明灯等程序化元素表演的 MV；也适用于从参考 MV 中逆向风格规则、节拍卡点、纸感音效与质检流程。关键词：剪纸 MV、paper-cut music video、Remotion 动画、歌词卡点、分层纸偶、paper stop-motion、程序化音效。"
 license: MIT
 metadata:
   version: "0.1.0"
@@ -17,14 +17,14 @@ metadata:
 1. 观众第一眼看见谁/什么？
 2. 这一拍发生了什么可见变化？
 3. 纸的哪一层在动，为什么这样动？
-4. 这个镜头和其他八个镜头在构图与景别上有什么不可互换的差异？
+4. 这个镜头和其他镜头在构图与景别上有什么不可互换的差异？
 
 ## 何时使用
 
 - 用户给一首歌，要求做剪纸/纸偶/拼贴/纸片 stop-motion 风格的 MV。
 - 用户给了逐句/逐镜分镜，要求用 Remotion、React、SVG 或代码实现。
 - 用户想从 1–3 支参考 MV 反推一种可复用的视频 skill。
-- 用户要“9 个镜头、每镜不同构图、切点卡在唱句最近的拍上”。
+- 用户要“少量镜头、每镜不同构图、切点卡在唱句最近的拍上”。MVP 先做 4 镜，完整片可扩到 9 镜。
 
 不适用：写实合成、真人拍摄、需要视频/图像生成模型的镜头、复杂长叙事。
 
@@ -55,11 +55,8 @@ metadata:
 ```powershell
 python -m pip install -r requirements.txt
 python scripts/analyze_track.py public/audio/song.mp3 `
-  --cuts 3.6,5.7,7.4 `
-  --scene-components world,split,world `
-  --scene-names 启航,离开,尾声 `
-  --out timing.json `
-  --emit-ts src/generated/timeline.generated.ts
+  --lrc lyrics.lrc `
+  --out timing.json
 ```
 
 输出应至少包含：
@@ -72,20 +69,36 @@ python scripts/analyze_track.py public/audio/song.mp3 `
 
 若没有 LRC，就用参考画面/ASR 得到逐句歌词，再人工核对每句起唱。**不从字幕消失时间推断下一句起唱。**
 
-### 2. 写 `STORYBOARD.md`
+### 2. 写 `storyboard.json`
 
 每镜至少写：
 
-```text
-镜号 / 起止时间 / 歌词
-主构图（必须唯一）
-观众先看到什么，再看到什么
-每拍动作（哪一层、怎么动）
-进入/离开方式
-音效 cue
+```json
+{
+  "id": "01",
+  "start": 0,
+  "end": 4,
+  "intent": "这句歌词在讲什么",
+  "metaphor": "观众具体看到什么",
+  "scene": {
+    "archetype": "wedding-arch",
+    "subject": ["bride", "groom"],
+    "camera": "low angle, slow push-in",
+    "palette": "rose-gold",
+    "motion": "one banknote layer per beat",
+    "transition": "paper tear"
+  },
+  "lyrics": []
+}
 ```
 
-九镜常用构图轴：
+验证：
+
+```powershell
+python scripts/validate_storyboard.py storyboard.json
+```
+
+常用构图轴：
 
 | 镜号 | 构图任务 | 例子 |
 |---|---|---|
@@ -113,6 +126,14 @@ python scripts/analyze_track.py public/audio/song.mp3 `
 
 ### 4. 生成时间轴并搭 Remotion 骨架
 
+```powershell
+python scripts/storyboard_to_timeline.py timing.json storyboard.json `
+  --out-ts src/generated/timeline.generated.ts
+```
+
+生成器会把 `storyboard.shots[].scene.archetype` 写进 `scenes[].component`，
+把每镜歌词写进 `lyrics[]`。未经确认的 storyboard 不允许进入这一步。
+
 推荐目录：
 
 ```text
@@ -129,7 +150,7 @@ src/
   PaperCutMV.tsx
 ```
 
-`timing.json -> timeline.generated.ts` 是唯一时间真相：FPS、总帧数、拍点、切点、歌词、音频、音效 cue 都来自一次 codegen。禁止在场景里手写秒数或复制另一套 BPM 网格。
+`timing.json + storyboard.json -> timeline.generated.ts` 是唯一时间真相：FPS、总帧数、拍点、切点、歌词、音频、音效 cue 都来自一次 codegen。禁止在场景里手写秒数或复制另一套 BPM 网格。
 
 `PaperCutMV` 用 scene registry 渲染 `timeline.generated.ts` 里的场景，并向每个场景注入：
 
@@ -171,11 +192,9 @@ type SceneProps = {
 cue 文件传给 codegen：
 
 ```powershell
-python scripts/analyze_track.py public/audio/song.mp3 `
+python scripts/storyboard_to_timeline.py timing.json storyboard.json `
   --cues cues.json `
-  --scene-components world,split `
-  --out timing.json `
-  --emit-ts src/generated/timeline.generated.ts
+  --out-ts src/generated/timeline.generated.ts
 ```
 
 混音原则：BGM 保持主位；SFX 起音对齐切点，尾音可跨镜。不要让每个拍点都响同一种铃。
@@ -198,29 +217,34 @@ python scripts/contact_sheet.py out/papercut-mv.mp4 --timing timing.json \
 
 - `papercut-mv.mp4`
 - `poster.png`
-- `contact-sheet.jpg`（九镜各一张）
+- `contact-sheet.jpg`（每镜一张）
 - `timing.json`
-- `timing.json` 生成的 `src/generated/timeline.generated.ts`
-- `STORYBOARD.md`
+- `storyboard.json`
+- `timing.json + storyboard.json` 生成的 `src/generated/timeline.generated.ts`
 
-## v2 参数化引擎（实验）
+## 歌词 → 分镜（主路径）
 
-`examples/v2-lab` 走了另一条路径：不逐歌手写场景，而是
-`song_facts.py -> song.json -> direct.py -> shots.json -> 5 个参数化构图`。
-切点量化到小节线（并在 1 小节内优先对齐唱句终点），镜头长度由段落能量决定，
-构图库负责纸感与视差。
+不要用镜号取模决定构图。每首歌先写 `storyboard.json`，把每个镜头绑定到歌词意图：
 
-v2 的两个关键接入点：
+- `lyric.start / lyric.end / lyric.text`
+- `intent`：这句歌词在讲什么
+- `metaphor`：观众具体看到什么
+- `scene.archetype / subject / camera / palette / motion / transition`
+- `cut`：实际切点，必须来自实测 `beats`
 
-- **逐拍重音**：`song_facts.py` 输出每拍的 `strength/low/flux/downbeat/section`，
-  渲染层用 `beatPulse(time, marks, k)` 让它驱动画面——重拍抬升、弱拍只呼吸。
-  没有这一步，画面在网格上但“听不见音乐”。
-- **倍频校验**：`tempo.octave` 记录 salience 是否说明该 BPM 是细分（半速），
-  若是则按真实拍点抽稀，而不是重新估计。
+执行顺序：
 
-真实歌曲仍需人工审分镜与美术；详见 `examples/v2-lab/README.md`。
+1. 选片段；
+2. 按歌词分组，不让一句歌词横跨多个无意义镜头；
+3. 为每组写 `intent` 与 `metaphor`；
+4. 选一个构图轴、一个可见动作和一个转场；
+5. 人工确认 `storyboard.json`；
+6. 再实现场景、渲染和 QA。
 
-## 交付检查（v2 QA）
+格式见 `references/storyboard-schema.json`，可运行示例见仓库
+`examples/storyboard-first/`。禁止把 `shot_index % len(pool)` 当作叙事逻辑。
+
+## 交付检查
 
 `scripts/qa_video.py` 分两层：
 
@@ -269,10 +293,10 @@ reference analysis -> style DNA -> engine template -> one finished example -> QA
 - `references/audio-sync.md`：节拍/歌词对齐、SFX 混音
 - `references/composition-matrix.md`：九镜不重复构图检查表
 - `references/qa.md`：交付前验收清单
+- `references/storyboard-schema.json`：歌词驱动分镜的 JSON Schema
+- `scripts/validate_storyboard.py`：校验切点覆盖、歌词归属和语义字段
+- `scripts/storyboard_to_timeline.py`：把确认后的 storyboard 转成 Remotion 时间轴
 - `scripts/analyze_track.py`：BPM、实测拍点、切点吸附、`musical_body_end`、codegen
-- `scripts/song_facts.py`：v2 声音事实（downbeat / 小节 / 段落 / 逐拍能量）
-- `scripts/direct.py`：v2 小节量化分镜 + `STORYBOARD.md` + Remotion TS
-- `scripts/song2video.py`：v2 一条命令入口（分析 → 分镜 → codegen → 可选渲染）
 - `scripts/generate_sfx.py`：纸感音效合成
 - `scripts/qa_video.py`：参数化编码/时长/流检查
 - `scripts/contact_sheet.py`：按 `timing.json` 每个 scene 取中间帧

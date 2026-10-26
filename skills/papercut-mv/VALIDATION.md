@@ -53,6 +53,17 @@ subsequent renders use the browser cache.
 
 `skill-creator/scripts/quick_validate.py`: PASS
 
+## Storyboard contract
+
+- `validate_storyboard.py`: PASS on `examples/storyboard-first/storyboard.json`
+- `storyboard_to_timeline.py`: emits 4 scenes / 4 lyric lines / 16.0s
+- Storyboard tests: PASS
+  - contiguous shot coverage
+  - non-empty intent and metaphor
+  - duplicate archetype warning
+  - storyboard-to-timeline component mapping
+  - duration mismatch rejection
+
 ## Independent CC0换歌 test
 
 An independent agent tested with

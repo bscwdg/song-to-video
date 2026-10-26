@@ -5,8 +5,8 @@ import {AUDIO, BEATS, LYRICS, MARKS, METER, SFX, SHOTS} from "../generated/shots
 /**
  * The one-click film. `shots.generated.ts` is produced by:
  *
- *   python skills/papercut-mv/scripts/song_facts.py <song> --lrc <lrc> --out song.json
- *   python skills/papercut-mv/scripts/direct.py song.json \
+ *   python experiments/v2-engine/scripts/song_facts.py <song> --lrc <lrc> --out song.json
+ *   python experiments/v2-engine/scripts/direct.py song.json \
  *     --out shots.json --storyboard STORYBOARD.md \
  *     --emit-ts src/generated/shots.generated.ts
  *

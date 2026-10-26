@@ -7,9 +7,10 @@
 1. 读取歌曲和歌词
 2. 测 BPM、拍点和音乐正文终点
 3. 把切点吸附到真实拍点
-4. 生成 Remotion 时间轴
-5. 实现 9 个剪纸镜头
-6. 渲染并做 QA
+4. 把歌词分组成有语义的分镜
+5. 生成 Remotion 时间轴
+6. 实现剪纸镜头
+7. 渲染并做 QA
 
 ## 两种使用方式
 
@@ -62,12 +63,12 @@ Copy-Item "$src\*" $dst -Recurse -Force
 
 歌曲：D:\music\song.mp3
 歌词：D:\music\song.lrc
-目标：9 个不重复构图，切点吸附到真实拍点。
+目标：先做 4 个不重复构图，切点吸附到真实拍点。
 
 先完成：
 1. 音频分析
 2. 拍点和场景切分
-3. 9 镜分镜
+3. 4 镜 storyboard.json：每镜写 intent、metaphor、scene
 
 先不要渲染整片，等我确认分镜后再实现代码。
 ```
@@ -75,11 +76,30 @@ Copy-Item "$src\*" $dst -Recurse -Force
 确认分镜后，再继续：
 
 ```text
-按确认后的 STORYBOARD.md 实现场景。
-先渲染 9 张中点静帧给我看，确认后再渲染整片。
+按确认后的 storyboard.json 实现场景。
+先渲染 4 张中点静帧给我看，确认后再渲染整片。
 ```
 
-这种方式比直接说“帮我做个视频”更稳定，因为 Agent 不会在分镜未确认时提前铺 9 个场景代码。
+这种方式比直接说“帮我做个视频”更稳定，因为 Agent 不会在分镜未确认时提前铺场景代码。
+
+## 先写 storyboard.json
+
+`storyboard.json` 是主路径的核心文件。没有它，不要进入场景实现。
+
+它把每句歌词绑定到：
+
+- `intent`：这句在讲什么
+- `metaphor`：观众具体看到什么
+- `scene`：构图、主体、机位、色板、动作、转场
+
+格式见 [STORYBOARD_SPEC.md](STORYBOARD_SPEC.md)。示例见
+[examples/storyboard-first/storyboard.json](../examples/storyboard-first/storyboard.json)。
+
+验证：
+
+```powershell
+python ..\..\skills\papercut-mv\scripts\validate_storyboard.py storyboard.json
+```
 
 ## 标准命令
 
@@ -87,12 +107,11 @@ Copy-Item "$src\*" $dst -Recurse -Force
 
 ```powershell
 python scripts\analyze_track.py public\audio\song.mp3 `
-  --cuts 3.6,5.7,7.4 `
-  --scene-components world,split,world `
-  --scene-names 起航,离开,尾声 `
-  --lrc lyrics.lrc `
-  --out timing.json `
-  --emit-ts src\generated\timeline.generated.ts
+  --lrc lyrics.lrc --out timing.json
+
+python scripts\storyboard_to_timeline.py `
+  timing.json storyboard.json `
+  --out-ts src\generated\timeline.generated.ts
 ```
 
 实现场景后：
@@ -135,8 +154,8 @@ python scripts\contact_sheet.py out\papercut-mv.mp4 --timing timing.json `
 my-song/
 ├─ public/audio/song.mp3
 ├─ lyrics.lrc
+├─ storyboard.json
 ├─ timing.json
-├─ STORYBOARD.md
 ├─ src/generated/timeline.generated.ts
 ├─ src/scenes/
 └─ out/
@@ -148,9 +167,9 @@ my-song/
 
 模板只提供纸张材质、纸偶、时间轴和场景协议。每首歌的构图、角色和动作仍需实现。
 
-### 可以自动选 9 个镜头吗？
+### 可以自动选镜头吗？
 
-Agent 可以根据歌词结构提出 9 镜分镜，但必须先确认构图和动作。代码只能执行已确定的分镜。
+Agent 可以根据歌词提出镜头方案，但必须先写成 `storyboard.json` 并确认。代码只能执行已确定的分镜。
 
 ### 可以换视觉风格吗？
 
@@ -163,6 +182,7 @@ Agent 可以根据歌词结构提出 9 镜分镜，但必须先确认构图和�
 ## 当前限制
 
 - 只内置 16:9 模板
+- 当前 MVP 先做 4 镜、15–25 秒的片段
 - 场景美术需要逐镜实现
 - 分镜和画面质量需要人工审查
 - 不是一键生成任意题材视频的产品

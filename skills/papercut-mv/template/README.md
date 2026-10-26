@@ -24,21 +24,30 @@ This is a reusable 16:9 Remotion starter, not a finished film. It contains no so
    python scripts/generate_sfx.py
    ```
 
-4. Generate the timing data and Remotion timeline:
+4. Write `storyboard.json` from `storyboard.example.json`. Every shot needs
+   `intent`, `metaphor`, and a `scene` block. Confirm the storyboard before
+   writing scene code:
+
+   ```powershell
+   python scripts/validate_storyboard.py storyboard.json
+   ```
+
+5. Generate measured timing and then the Remotion timeline:
 
    ```powershell
    python scripts/analyze_track.py public/audio/song.mp3 `
-     --cuts 3.6,5.7,7.4 `
-     --scene-components world,split,world `
-     --scene-names 启航,离开,尾声 `
      --lrc lyrics.lrc `
-     --out timing.json `
-     --emit-ts src/generated/timeline.generated.ts
+     --out timing.json
+
+   python scripts/storyboard_to_timeline.py timing.json storyboard.json `
+     --out-ts src/generated/timeline.generated.ts
    ```
 
-5. Implement only the scene components named by `--scene-components`; register each component key in `src/scenes/registry.tsx`.
-6. Optionally pass `--cues cues.example.json` to mix procedural SFX.
-7. Check and render:
+6. Implement only the scene components named by `scene.archetype`; register each
+   component key in `src/scenes/registry.tsx`.
+7. Optionally pass `--cues cues.example.json` to `storyboard_to_timeline.py` to
+   mix procedural SFX.
+8. Check and render:
 
    ```powershell
    npm run typecheck
