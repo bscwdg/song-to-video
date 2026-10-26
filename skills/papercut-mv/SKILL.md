@@ -207,8 +207,32 @@ python scripts/contact_sheet.py out/papercut-mv.mp4 --timing timing.json \
 
 `examples/v2-lab` 走了另一条路径：不逐歌手写场景，而是
 `song_facts.py -> song.json -> direct.py -> shots.json -> 5 个参数化构图`。
-切点量化到小节线，镜头长度由段落能量决定，构图库负责纸感与视差。
+切点量化到小节线（并在 1 小节内优先对齐唱句终点），镜头长度由段落能量决定，
+构图库负责纸感与视差。
+
+v2 的两个关键接入点：
+
+- **逐拍重音**：`song_facts.py` 输出每拍的 `strength/low/flux/downbeat/section`，
+  渲染层用 `beatPulse(time, marks, k)` 让它驱动画面——重拍抬升、弱拍只呼吸。
+  没有这一步，画面在网格上但“听不见音乐”。
+- **倍频校验**：`tempo.octave` 记录 salience 是否说明该 BPM 是细分（半速），
+  若是则按真实拍点抽稀，而不是重新估计。
+
 真实歌曲仍需人工审分镜与美术；详见 `examples/v2-lab/README.md`。
+
+## 交付检查（v2 QA）
+
+`scripts/qa_video.py` 分两层：
+
+- **规格**：编码、流、分辨率、帧率、时长。
+- **工艺**：逐拍死拍（相对本片逐拍帧差中位数）、黑帧、冻结帧、
+  字幕底部安全区、BS.1770 响度。
+
+`--strict` 让工艺问题也判 FAIL。找 ffmpeg 的顺序是 PATH 优先，其次用 Remotion
+自带的构建（那份是精简版：无 `fps`/`ebur128` 滤镜、无 `rawvideo` muxer，
+所以帧解码走 `scale` + PNG 序列、响度自算而不是读日志）。
+
+`scripts/sync_scripts.py --check` 校验各处脚本副本与单一源一致；CI 会跑它。
 
 ## Remotion + SVG 踩坑
 

@@ -60,12 +60,12 @@ npx remotion render src\index.ts V2Song out\v2.mp4 `
 | v0.1 | v0.2-lab |
 |---|---|
 | 只有 BPM + beats | beats + downbeats + bars + sections + 逐拍 rms/low/mid/high/flux |
-| 切点吸“最近的拍” | 切点吸“小节线”，段落决定镜头长度 |
+| 切点吸“最近的拍” | 切点吸“小节线”，并在 1 小节内优先对齐到唱句终点（`phrases`） |
 | 每首歌手写 2000+ 行场景 | 5 个参数化 archetype，`shots.json` 驱动 |
 | 单层贴纸 | bg/mg/fg 三层视差 + 空气透视 + 接触阴影 |
 | 静态纸人 + 花束旋转 | 关节纸偶（髋/膝/肩/肘）+ 姿态库 + 衣摆次级动作 |
 | 固定 54px nowrap 字幕 | 限时、换行、长句缩放、底部安全区 |
-| 只有规格 QA | 自动 EDL 自带镜头表，后续接逐拍帧差/响度 QA |
+| 只有规格 QA | 规格 + 工艺 QA：相对阈值死拍、黑帧、冻结帧、字幕安全区、BS.1770 响度 |
 
 ## 镜头库
 
@@ -84,18 +84,19 @@ npx remotion render src\index.ts V2Song out\v2.mp4 `
 - 段落检测依赖和声/色度变化；强节奏、弱和声的歌（说唱、电子）仍需人工改 `song.json`。
 - `corridor` 与 `macro` 的美术仍偏简单；纸偶在远景只保证剪影可读，不保证表演。
 - 色板目前固定为暖色家族（dusk/ember/wine/night），亮色歌需要换 family。
-- 只有 16:9；`Stage` 已做归一化，但 9:16 需要按画幅重排构图。
-- SFX 只生成 cue 表，`V2Song` 还未挂 SFX 轨；BGM 直接播源文件，未做 LUFS 归一。
-- 没有自动 QA（逐拍帧差 / 黑帧 / 字幕越界），下一阶段补。
+- 9:16 已能出片（`V2SongPortrait`，1080×1920），`Stage` 按短边给物体定尺、按画幅收窄横向偏移；但 5 个 archetype 的竖屏构图是重排出来的初版，仍需要逐镜人工审。
+- 真实 BGM 未做 LUFS 归一：`qa_video.py` 能**测**响度，但渲染链不会自动**调整**它。
+- 死拍判定是相对阈值（相对本片逐拍帧差中位数），不是绝对电影标准；阈值参数可调，判定结果需要人看一遍。
+- 画面动效（纸屑、波光、鸟）已按重音调制，但相机推拉本身逐帧等量变化，仍会压低「强拍/弱拍」的帧差比（实测 1.4–1.5x，而包络是 6x）。
 
 ## 文件
 
 ```text
 src/engine/
-  stage.ts       归一化舞台
+  stage.ts       归一化舞台（短边定尺 + 竖屏/横屏重排）
   geom.ts        撕边/山脊/圆环几何
   palette.ts     暖色家族色板
-  camera.ts      运镜 + 视差 + 拍脉冲
+  camera.ts      运镜 + 视差 + 加权拍脉冲（beatPulse/barPulse）
   paper.tsx      纸材质、滤镜、颗粒
   depth.tsx      深度层 + 接触阴影
   puppet.tsx     关节纸偶

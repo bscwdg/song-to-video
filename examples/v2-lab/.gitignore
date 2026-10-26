@@ -4,6 +4,10 @@ out/
 song.json
 shots.json
 STORYBOARD.auto.md
+# Lyric text supplied by the user stays local; the repo ships code and timed
+# data only. Generated images are also local (they are AI output, not source).
+lyrics.lrc
+public/ai/*
 public/audio/*
 !public/audio/README.md
 public/sfx/*.wav

@@ -1,0 +1,40 @@
+{
+  "title": "数钱的女孩 · AI 样片（前 4 镜）",
+  "note": "4 句歌词 → 4 张锚图 → 逐拍装配。只为验证风格与歌词贴合度，不是成片。",
+  "style": "layered paper-cut illustration, matte paper texture, visible cut-paper edges, soft drop shadows between layers, flat color planes, warm wine red gold and cream palette, single full-frame composition, cinematic lighting, no text, no letters, no watermark, no border",
+  "aspect": "16:9",
+  "shots": [
+    {
+      "slug": "01-wish-money",
+      "start": 0.41,
+      "end": 3.11,
+      "lyrics": ["心爱的女孩她已经很如愿了", "我让她抱到钱数"],
+      "beat": "情愿成真 → 抱紧钱",
+      "prompt": "a young woman in a simple paper dress holding a thick stack of paper banknotes against her chest, eyes closed with quiet relief, banknotes lifting into the air around her like falling leaves, centered portrait composition"
+    },
+    {
+      "slug": "02-wedding",
+      "start": 3.11,
+      "end": 4.09,
+      "lyrics": ["今年我会举办场婚礼"],
+      "beat": "婚礼拱门",
+      "prompt": "a paper wedding arch built from layered cream and gold paper, two small paper figures standing beneath it facing each other, paper flower garlands climbing the arch, tiny paper petals falling, symmetrical composition"
+    },
+    {
+      "slug": "03-stage-cry",
+      "start": 4.09,
+      "end": 6.03,
+      "lyrics": ["也许我们一样在舞台上放声大哭"],
+      "beat": "舞台中央放声大哭",
+      "prompt": "a paper stage with heavy curtains opened wide, one lone paper figure standing centre stage crying, translucent paper tears falling as thin ribbons, a dark row of audience silhouettes along the bottom edge, single hard spotlight from above, theatrical framing"
+    },
+    {
+      "slug": "04-old-house",
+      "start": 6.03,
+      "end": 9.19,
+      "lyrics": ["以前的那混蛋心里面", "如今也多了些很多人在他哪儿住"],
+      "beat": "旧屋剖开，里面住满了人",
+      "prompt": "a cutaway paper dollhouse with its interior exposed, many tiny paper figures living inside the rooms, warm golden light glowing from each window, the house sitting on layered paper hills, dusk sky with torn paper clouds, wide establishing composition"
+    }
+  ]
+}
