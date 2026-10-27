@@ -43,6 +43,7 @@ song-to-video/
 ├─ skills/
 │  └─ papercut-mv/          # 稳定剪纸 skill
 ├─ styles/                   # 5 个 preview 风格包 + registry
+├─ projects/                 # 本地歌曲工程，含未分发歌词/音频，默认不提交
 ├─ examples/
 │  ├─ style-gallery/         # 五种风格 20 秒预览
 │  ├─ storyboard-first/     # 4 镜语义分镜样例（非固定规则）
